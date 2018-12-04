@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  dotnet:
+    build:
+      dockerfile: docker/dotnet/Dockerfile
+      context: .
+      
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_DB=windmill
+      - POSTGRES_USER=windmill
+      - POSTGRES_PASSWORD=1234
