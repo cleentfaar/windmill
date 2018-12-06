@@ -1,7 +1,10 @@
+using Windmill.Game;
+
 namespace Windmill.Storage
 {
     public interface IAdapter
     {
-        void Save(Game.Game game);
+        void Save(GameState gameState);
+        GameState Load(Id id);
     }
 }

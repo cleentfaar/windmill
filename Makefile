@@ -1,5 +1,11 @@
-up:
-	docker-compose up -d
+build:
+	docker-compose build windmill
+	
+watch: build
+	docker-compose run --rm windmill
+	
+run:
+	docker-compose up windmill
 
-install:
-	docker-compose run --rm ...
+clean:
+	docker-compose down --remove-orphans

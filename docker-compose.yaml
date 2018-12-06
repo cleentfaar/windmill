@@ -1,10 +1,14 @@
 version: '3.7'
 
 services:
-  dotnet:
+  windmill:
     build:
-      dockerfile: docker/dotnet/Dockerfile
+      dockerfile: docker/windmill/Dockerfile
       context: .
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app:cached
       
   postgres:
     image: postgres:11-alpine
@@ -12,3 +16,9 @@ services:
       - POSTGRES_DB=windmill
       - POSTGRES_USER=windmill
       - POSTGRES_PASSWORD=1234
+    volumes:
+      - data-postgres:/usr/share/postgresql/data
+
+volumes:
+  data-postgres:
+    driver: local

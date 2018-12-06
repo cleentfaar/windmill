@@ -1,10 +1,15 @@
 using System;
 using ManyConsole;
-using Windmill.Storage;
-using Menu = EasyConsole.Menu;
+using Windmill.Display;
+using Windmill.Game;
+using Windmill.Game.Player;
+using PlayerType = Windmill.Game.Player.Type;
+using PlayerFactory = Windmill.Game.Player.Factory;
+using IAdapter = Windmill.Storage.IAdapter;
+using Postgres = Windmill.Storage.Postgres;
 using Factory = Windmill.Game.Factory;
 using Id = Windmill.Game.Id;
-using Type = Windmill.Game.Player.Type;
+using Menu = EasyConsoleCore.Menu;
 
 namespace Windmill
 {
@@ -16,8 +21,7 @@ namespace Windmill
 
         public GameCommand()
         {
-            IsCommand("game", "Start a new game or loads an existing one from the database or a PGN file");
-            //HasAlias("--echo");
+            IsCommand("game", "Start a new game or loads an existing game from the database or a PGN file");
 
             HasOption(
                 "l|load=",
@@ -31,62 +35,83 @@ namespace Windmill
                 v => _pathToPgn = v
             );
 
-            //AllowsAnyAdditionalArguments("<foo1> <foo2> <fooN> where N is a word");
-            
+            // TODO Implement DI for this stuff
             _storage = new Postgres();
         }
 
         public override int Run(string[] remainingArguments)
         {
+            GameState gameState = null;
+            
             if (_load is null)
             {
                 if (string.IsNullOrWhiteSpace(_pathToPgn))
                 {
-                    Console.WriteLine("Starting new game");
-
-                    _load = StartNewGame();
+                    gameState = StartNewGame();
                 }
                 else
                 {
-                    Console.WriteLine("Importing game from PGN");
-
-                    _load = ImportGame(_pathToPgn);
+                    gameState = ImportGame(_pathToPgn);
                 }
-            }
-                
-            Console.WriteLine("Loading game with ID "+_load);
 
-            LoadGame(_load);
+                //SaveGame(game);
+            } else {
+                gameState = LoadGame(_load);
+            }
+
+            RenderGame(gameState);
+
+            var nextMove = AskForNextMove();
+            
+            
 
             return 0;
         }
 
-        private void LoadGame(Id gameId)
+        private void RenderGame(GameState gameState)
         {
-            //throw new NotImplementedException();
+            AsciiGameRenderer renderer = new AsciiGameRenderer();
+
+            string ascii = renderer.Render(gameState);
+            
+            Console.WriteLine(ascii);
         }
 
-        private Id ImportGame(string pgn)
+        private void SaveGame(GameState gameState)
         {
+            _storage.Save(gameState);
+        }
+
+        private GameState LoadGame(Id gameId)
+        {
+            Console.WriteLine("Loading game with ID "+_load);
+            
+            return _storage.Load(gameId);
+        }
+
+        private GameState ImportGame(string pgn)
+        {
+            Console.WriteLine("Importing game from PGN");
+
             throw new NotImplementedException();
         }
 
-        private Id StartNewGame()
+        private GameState StartNewGame()
         {
-            var id = Id.Generate();
-            var mode = AskForMode();
-            var color = AskForColor();
-            var white = Game.Player.Factory.Create(mode < 3 ? Type.Human : Type.Computer);
-            var black = Game.Player.Factory.Create(mode == 1 ? Type.Human : Type.Computer);
-            var game = Factory.Create(
+            Console.WriteLine("Starting new game");
+
+            Id id = Id.Generate();
+            int mode = AskForMode();
+            int color = AskForColor();
+            PlayerState white = PlayerFactory.Create(mode < 3 ? PlayerType.Human : PlayerType.Computer);
+            PlayerState black = PlayerFactory.Create(mode == 1 ? PlayerType.Human : PlayerType.Computer);
+            GameState gameState = Factory.Create(
                 id, 
                 color == 1 ? white : black, 
                 color == 2 ? black : white
             );
 
-            _storage.Save(game);
-
-            return id;
+            return gameState;
         }
 
         private int AskForMode()
@@ -117,6 +142,15 @@ namespace Windmill
                 .Add("Black", () => value = 2);
 
             modeSelection.Display();
+            
+            return value;
+        }
+
+        private string AskForNextMove()
+        {
+            Console.WriteLine("What move would you like to make?");
+
+            var value = Console.ReadLine();
             
             return value;
         }

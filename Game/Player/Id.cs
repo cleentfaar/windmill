@@ -4,11 +4,11 @@ namespace Windmill.Game.Player
 {
     public class Id
     {
-        private Guid id;
+        private readonly Guid _id;
         
-        public Id(Guid id2)
+        public Id(Guid id)
         {
-            id = id2;
+            this._id = id;
         }
 
         public static Id Generate()
@@ -18,7 +18,7 @@ namespace Windmill.Game.Player
 
         public override string ToString()
         {
-            return id.ToString();
+            return _id.ToString();
         }
 
         public static Id FromString(string s)

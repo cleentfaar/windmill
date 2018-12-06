@@ -9,4 +9,6 @@ FROM microsoft/dotnet:2.1-runtime
 
 COPY --from=build /app/build /app
 WORKDIR /app
-CMD dotnet Windmill.dll
+
+# Here will be a command that runs the engine as a background service and receives incoming analysis requests
+# e.g. CMD dotnet Windmill.dll analyse --port=1234

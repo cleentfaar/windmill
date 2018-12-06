@@ -2,9 +2,9 @@ namespace Windmill.Game.Player
 {
     public static class Factory
     {
-        public static Player Create(Type type)
+        public static PlayerState Create(Type type)
         {
-            return new Player(
+            return new PlayerState(
                 Id.Generate(),
                 type
             );

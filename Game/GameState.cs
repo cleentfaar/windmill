@@ -1,13 +1,14 @@
 using System.Collections.Generic;
+using Windmill.Game.Player;
 
 namespace Windmill.Game
 {
-    public class Game
+    public class GameState
     {
-        public Game(
+        public GameState(
             Id id,
-            Player.Player white,
-            Player.Player black,
+            PlayerState white,
+            PlayerState black,
             Dictionary<int, int?> positions,
             List<string> history
         )

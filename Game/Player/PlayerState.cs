@@ -1,11 +1,11 @@
 namespace Windmill.Game.Player
 {
-    public class Player
+    public class PlayerState
     {
         private readonly Id Id;
-        private readonly Type Type;
+        public readonly Type Type;
 
-        public Player(Id id, Type type)
+        public PlayerState(Id id, Type type)
         {
             Id = id;
             Type = type;
