@@ -8,26 +8,26 @@ use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
 class AsciiBoardEncoderTest extends AbstractTestCase
 {
-    /**
-     * @dataProvider provideFenAndExpectedAscii
-     */
-    public function testEndToEndGames(
-        string $FEN,
-        string $expectedOutput
-    ): void {
-        $game = self::createGameFromFEN($FEN);
-        $encoder = new AsciiBoardEncoder(false);
-        $actualOutput = $encoder->encode($game->board);
+	/**
+	 * @dataProvider provideFenAndExpectedAscii
+	 */
+	public function testEndToEndGames(
+		string $FEN,
+		string $expectedOutput
+	): void {
+		$game = self::createGameFromFEN($FEN);
+		$encoder = new AsciiBoardEncoder(false);
+		$actualOutput = $encoder->encode($game->board);
 
-        $this->assertEquals($expectedOutput, $actualOutput);
-    }
+		$this->assertEquals($expectedOutput, $actualOutput);
+	}
 
-    public function provideFenAndExpectedAscii()
-    {
-        return [
-            [
-                FENGameEncoder::STANDARD_FEN,
-                <<<EOF
+	public function provideFenAndExpectedAscii()
+	{
+		return [
+			[
+				FENGameEncoder::STANDARD_FEN,
+				<<<EOF
                 8  ♜  ♞  ♝  ♛  ♚  ♝  ♞  ♜ 
                 7  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎ 
                 6                         
@@ -39,7 +39,7 @@ class AsciiBoardEncoderTest extends AbstractTestCase
                    A  B  C  D  E  F  G  H 
 
                 EOF,
-            ],
-        ];
-    }
+			],
+		];
+	}
 }

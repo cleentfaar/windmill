@@ -10,12 +10,12 @@ use App\Windmill\Position;
 
 class RookCalculator extends AbstractPieceCalculator
 {
-    public function calculate(
-        Game           $game,
-        Position       $currentPosition,
-        Color          $currentColor,
-        MoveCollection &$moveCollection
-    ): void {
-        $walker = new BoardWalker($currentPosition, $currentColor, $game->board);
-    }
+	public function calculate(
+		Game $game,
+		Position $currentPosition,
+		Color $currentColor,
+		MoveCollection &$moveCollection
+	): void {
+		$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
+	}
 }

@@ -8,53 +8,51 @@ use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\Move\MoveCollection;
 use App\Windmill\Presentation\Replay;
-use Exception;
 
 class PgnReplayEncoder implements ReplayEncoderInterface
 {
-    public function __construct(private readonly MoveEncoderInterface $moveEncoder = new SANMoveEncoder())
-    {
-    }
+	public function __construct(private readonly MoveEncoderInterface $moveEncoder = new SANMoveEncoder())
+	{
+	}
 
-    public function encode(Replay $game): string
-    {
+	public function encode(Replay $game): string
+	{
+	}
 
-    }
+	public function decode(string $game, bool $returnUpToFailure = false): Replay
+	{
+		$parser = new PgnParser($game);
+		$parsedGame = $parser->getGame(0);
+		$game = $this->createGameFromMetadata($parsedGame);
+		$moves = new MoveCollection();
 
-    public function decode(string $game, bool $returnUpToFailure = false): Replay
-    {
-        $parser = new PgnParser($game);
-        $parsedGame = $parser->getGame(0);
-        $game = $this->createGameFromMetadata($parsedGame);
-        $moves = new MoveCollection();
+		foreach ($parsedGame->getMovesArray() as $pgnMove) {
+			try {
+				$move = $this->moveEncoder->decode($pgnMove, $game);
+				$game->move($move);
 
-        foreach ($parsedGame->getMovesArray() as $pgnMove) {
-            try {
-                $move = $this->moveEncoder->decode($pgnMove, $game);
-                $game->move($move);
+				$moves->add($move);
+			} catch (\Exception $e) {
+				if ($returnUpToFailure) {
+					break;
+				}
 
-                $moves->add($move);
-            } catch (Exception $e) {
-                if ($returnUpToFailure) {
-                    break;
-                }
+				$fen = new FENGameEncoder();
+				dump($fen->encode($game));
+				throw $e;
+			}
+		}
 
-                $fen = new FENGameEncoder();
-                dump($fen->encode($game));
-                throw $e;
-            }
-        }
+		return new Replay($this->createGameFromMetadata($parsedGame), $moves);
+	}
 
-        return new Replay($this->createGameFromMetadata($parsedGame), $moves);
-    }
-
-    private function createGameFromMetadata(PgnGame $parsedGame): Game
-    {
-        return GameFactory::standard(
-            $parsedGame->getWhite(),
-            null,
-            $parsedGame->getBlack(),
-            null,
-        );
-    }
+	private function createGameFromMetadata(PgnGame $parsedGame): Game
+	{
+		return GameFactory::standard(
+			$parsedGame->getWhite(),
+			null,
+			$parsedGame->getBlack(),
+			null,
+		);
+	}
 }

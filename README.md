@@ -1,51 +1,58 @@
-# Symfony Docker
+# Windmill
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework,
-with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) inside!
+Windmill is a highly extensible chess framework written in PHP, powered by [Symfony](https://symfony.com).
 
-![CI](https://github.com/dunglas/symfony-docker/workflows/CI/badge.svg)
+**Notable features include**:
+- play chess against any engine ([here](docs/supported_engines.md) is the list of supported engines so far), either through the CLI or web app (see Usage below).
+- replay historic chess games from a given PGN file (see [datasets](./datasets) for an overview of built-in games)
+- see the [Roadmap](#Roadmap) for more
 
-## Getting Started
 
-1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
-2. Run `docker compose build --no-cache` to build fresh images
-3. Run `docker compose up --pull always -d --wait` to start the project
-4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
-5. Run `docker compose down --remove-orphans` to stop the Docker containers.
+## Requirements
 
-## Features
+- `go-task` (MacOS: `brew install go-task/tap/go-task`, otherwise see https://taskfile.dev/installation/)
+- `docker` (see https://docs.docker.com/get-docker/)
 
-* Production, development and CI ready
-* Just 1 service by default
-* Blazing-fast performance thanks to [the worker mode of FrankenPHP](https://github.com/dunglas/frankenphp/blob/main/docs/worker.md) (automatically enabled in prod mode)
-* [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
-* Automatic HTTPS (in dev and prod)
-* HTTP/3 and [Early Hints](https://symfony.com/blog/new-in-symfony-6-3-early-hints) support
-* Real-time messaging thanks to a built-in [Mercure hub](https://symfony.com/doc/current/mercure.html)
-* [Vulcain](https://vulcain.rocks) support
-* Native [XDebug](docs/xdebug.md) integration
-* Super-readable configuration
 
-**Enjoy!**
+## Usage (WIP)
 
-## Docs
+- Run `make reset`
+- To play a game of chess, run `make console COMMAND='bin/console windmill:play'` to start a game of chess. NOTE: You can use the `--engine=your_engine` option if you want to play against a non-random engine.
+- To replay a game of chess, run `bin/console windmill:replay ./path/to/your/pgn_file.pgn` to replay a game from a PGN file, allowing you to go through it step by step.)
 
-1. [Build options](docs/build.md)
-2. [Using Symfony Docker with an existing project](docs/existing-project.md)
-3. [Support for extra services](docs/extra-services.md)
-4. [Deploying in production](docs/production.md)
-5. [Debugging with Xdebug](docs/xdebug.md)
-6. [TLS Certificates](docs/tls.md)
-7. [Using MySQL instead of PostgreSQL](docs/mysql.md)
-8. [Using Alpine Linux instead of Debian](docs/alpine.md)
-9. [Using a Makefile](docs/makefile.md)
-10. [Updating the template](docs/updating.md)
-11. [Troubleshooting](docs/troubleshooting.md)
 
-## License
+## Tests (WIP)
 
-Symfony Docker is available under the MIT License.
+- Run `make tests` to run all tests
 
-## Credits
 
-Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
+## Background/why
+
+- I love chess.
+- I've been a PHP programmer for 12+ years, turned Data Engineer for the last 2 years, and now want to see what I've been missing.
+- I had some time to spare.
+
+
+## Roadmap
+
+- Preparation
+  - [x] Dig into previous incarnations of this project to get inspired
+  - [x] Get familiar with the last 2 years of Symfony (and PHP) improvements.
+- Game fundamentals
+  - [x] Create a baseline of tests that the framework should abide to
+  - [x] Implement algorithm that adheres to this baseline
+  - [x] Be able to represent the game visually
+    - CLI:
+      - [x] Create initial proof of concept
+        - [x] Support FEN
+        - [x] Support PGN
+        - [x] Support SAN
+        - [x] Support ASCII
+    - Web App:
+      - [ ] Provide the same functionality as the CLI, only now though a website
+  - [ ] Create more complex scenarios, making sure the game logic deals with every possible case.
+  - [ ] Add more engines besides 'Random'
+- CLI
+  - [x] Able to play a basic game through the CLI
+- Webapp
+  - [] Able to play a basic game through the Web App. 

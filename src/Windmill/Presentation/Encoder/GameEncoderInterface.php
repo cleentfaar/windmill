@@ -7,7 +7,7 @@ use App\Windmill\PlayerInterface;
 
 interface GameEncoderInterface
 {
-    public function encode(Game $game): string;
+	public function encode(Game $game): string;
 
-    public function decode(string $encodedGame, PlayerInterface $whitePlayer, PlayerInterface $blackPlayer): Game;
+	public function decode(string $encodedGame, PlayerInterface $whitePlayer, PlayerInterface $blackPlayer): Game;
 }

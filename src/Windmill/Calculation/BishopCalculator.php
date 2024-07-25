@@ -10,13 +10,13 @@ use App\Windmill\Position;
 
 class BishopCalculator extends AbstractPieceCalculator
 {
-    public function calculate(
-        Game           $game,
-        Position       $currentPosition,
-        Color          $currentColor,
-        MoveCollection &$moveCollection
-    ): void {
-        $walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
-        $walker->diagonals($moveCollection);
-    }
+	public function calculate(
+		Game $game,
+		Position $currentPosition,
+		Color $currentColor,
+		MoveCollection &$moveCollection
+	): void {
+		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
+		$walker->diagonals($moveCollection);
+	}
 }

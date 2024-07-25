@@ -1,5 +1,8 @@
+version: '3'
+
 services:
   php:
+    container_name: 'windmill'
     image: ${IMAGES_PREFIX:-}app-php
     restart: unless-stopped
     environment:

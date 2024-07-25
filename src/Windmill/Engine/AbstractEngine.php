@@ -6,5 +6,5 @@ use App\Windmill\Game;
 
 abstract class AbstractEngine
 {
-    abstract public function recommend(Game $game): Recommendation;
+	abstract public function recommend(Game $game): Recommendation;
 }
