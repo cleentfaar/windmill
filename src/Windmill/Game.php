@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Windmill;
+
+use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\MultiMove;
+use App\Windmill\Move\SimpleMove;
+use App\Windmill\Piece\King;
+use App\Windmill\Piece\Pawn;
+use DateTimeImmutable;
+use Exception;
+use Symfony\Component\Uid\Uuid;
+
+class Game
+{
+    private ?AbstractMove $lastMove = null;
+
+    public function __construct(
+        public readonly Uuid                 $id,
+        public readonly State                $state,
+        public readonly Board                $board,
+        public readonly PlayerInterface      $whitePlayer,
+        public readonly PlayerInterface      $blackPlayer,
+        private Color                        $colorToMove,
+        public readonly CastlingAvailability $castlingAvailability,
+        private ?Position $enPassantTargetSquare = null,
+        private int                          $halfMoveClock = 0,
+        private int                          $fullMoveClock = 1,
+        public readonly ?DateTimeImmutable   $startedOn = null,
+        public readonly ?DateTimeImmutable   $endedOn = null
+    )
+    {
+    }
+
+    public function move(AbstractMove $move)
+    {
+        $this->updateStatesBeforeExecutingMove($move);
+        $this->board->move($move);
+        $this->colorToMove = $this->colorToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        $this->lastMove = $move;
+    }
+
+    public function isFinished(): bool
+    {
+        return in_array(
+            $this->state,
+            [State::FINISHED_WHITE_WINS, State::FINISHED_BLACK_WINS, State::FINISHED_DRAW]
+        );
+    }
+
+    public function currentColor(): Color
+    {
+        if ($this->isFinished()) {
+            throw new Exception("Game has finished, there is no current color to move");
+        }
+
+        return $this->colorToMove;
+    }
+
+    public function currentPlayer(): PlayerInterface
+    {
+        if ($this->isFinished()) {
+            throw new Exception("Game has finished, there is no current player to move");
+        }
+
+        return $this->colorToMove == Color::WHITE ? $this->whitePlayer : $this->blackPlayer;
+    }
+
+    private function updateStatesBeforeExecutingMove(AbstractMove $move): void
+    {
+        $halfMoveReset = false;
+
+        switch ($move::class) {
+            case SimpleMove::class:
+                if (
+                    abs($move->from->rank() - $move->to->rank()) == 2
+                    && $move->from->file() == $move->to->file()
+                    && $this->board->pieceOn($move->from)::class == Pawn::class
+                ) {
+                    $this->enPassantTargetSquare = $move->to;
+                }
+                if ($this->board->pieceOn($move->from)::class == Pawn::class) {
+                    // pawn is moving
+                    $halfMoveReset = true;
+                }
+                break;
+            case MultiMove::class:
+                foreach ($move->from as $x => $from) {
+                    if ($this->board->pieceOn($from)::class == King::class && abs($move->from[$x]->file() - $move->to[$x]->file()) > 1) {
+                        // castle
+                        if ($this->currentColor() == Color::WHITE) {
+                            $this->castlingAvailability->whiteCanCastleQueenside = false;
+                            $this->castlingAvailability->whiteCanCastleKingside = false;
+                        } else {
+                            $this->castlingAvailability->blackCanCastleQueenside = false;
+                            $this->castlingAvailability->blackCanCastleKingside = false;
+                        }
+                    }
+                }
+
+                foreach ($move->to as $x => $to) {
+                    if ($to == null && $this->board->pieceOn($move->from[$x])->color != $this->currentColor()) {
+                        // capture
+                        $halfMoveReset = true;
+                    }
+                }
+
+                break;
+        }
+
+        if ($halfMoveReset) {
+            $this->halfMoveClock = 0;
+        } else {
+            $this->halfMoveClock++;
+        }
+
+        if ($this->colorToMove == Color::BLACK) {
+            $this->fullMoveClock++;
+        }
+    }
+
+    public function halfMoveClock(): int
+    {
+        return $this->halfMoveClock;
+    }
+
+    public function fullMoveClock(): int
+    {
+        return $this->fullMoveClock;
+    }
+
+    public function enPassantTargetSquare(): ?Position
+    {
+        return $this->enPassantTargetSquare;
+    }
+}

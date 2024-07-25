@@ -1,0 +1,22 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  up:
+    cmds:
+      - docker compose up -d
+  start:
+    cmds:
+      - docker compose run --rm php bin/console windmill:play
+
+  reset:
+    cmds:
+      - docker compose run --rm php bin/console doctrine:migrations:migrate first -n
