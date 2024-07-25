@@ -35,13 +35,13 @@ class AsciiBoardEncoder implements BoardEncoderInterface
 		],
 	];
 
-	public function __construct(private readonly bool $solidWhite = true)
+	public function __construct(private readonly bool $solidWhite = true, private readonly bool $hollowBlack = false)
 	{
 	}
 
 	public function encode(Board $board): string
 	{
-		$output = '';
+		$output = "\n";
 
 		for ($rank = 8; $rank >= 1; --$rank) {
 			$output .= $rank.' ';
@@ -71,9 +71,17 @@ class AsciiBoardEncoder implements BoardEncoderInterface
 	protected function getPieceSymbol(?AbstractPiece $piece): string
 	{
 		if ($piece) {
+            if ($piece->color == Color::WHITE && $this->solidWhite) {
+                $color = Color::BLACK;
+            } elseif ($piece->color == Color::BLACK && $this->hollowBlack) {
+                $color = Color::WHITE;
+            } else {
+                $color = $piece->color;
+            }
+
 			return sprintf(
 				' %s ',
-				self::PIECE_SYMBOLS[$this->solidWhite ? Color::BLACK->value : $piece->color->value][$piece::class]
+				self::PIECE_SYMBOLS[$color->value][$piece::class]
 			);
 		}
 
