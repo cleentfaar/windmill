@@ -52,7 +52,3 @@ Windmill is a highly extensible chess framework written in PHP, powered by [Symf
       - [ ] Provide the same functionality as the CLI, only now though a website
   - [ ] Create more complex scenarios, making sure the game logic deals with every possible case.
   - [ ] Add more engines besides 'Random'
-- CLI
-  - [x] Able to play a basic game through the CLI
-- Webapp
-  - [] Able to play a basic game through the Web App. 
