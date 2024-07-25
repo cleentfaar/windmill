@@ -24,10 +24,10 @@ windmill:
 	docker compose run --rm php bin/console windmill:$(COMMAND)
 
 cs: ## Checks for code style issues
-	docker run -it --rm -v $(PWD):/code ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3 check --config src tests
+	docker compose run --rm php bin/php-cs-fixer check
 
 cs-fix: ## Fixes code style issues
-	docker run -it --rm -v $(PWD):/code ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3 fix --config src tests
+	docker compose run --rm php bin/php-cs-fixer fix
 
 test: ## Runs all tests
 	docker compose run --rm php bin/phpunit

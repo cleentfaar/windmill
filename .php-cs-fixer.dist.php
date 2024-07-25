@@ -12,4 +12,5 @@ return (new PhpCsFixer\Config())
     ->setFinder($finder)
     ->setIndent("\t")
     ->setLineEnding("\r\n")
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
 ;
