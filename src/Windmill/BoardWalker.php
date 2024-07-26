@@ -2,111 +2,25 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Move\MoveCollection;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
-
 class BoardWalker
 {
+	private array $positions = [];
 	private ?Position $currentPosition;
-	private array $recorded = [];
 
 	public function __construct(
-		public readonly ?Position $startingPosition,
+		public readonly Position $startingPosition,
 		private readonly Color $color,
 		private readonly Board $board,
-		private readonly bool $recording = false,
-		private readonly bool $allowIntermittentCollisions = false
 	) {
 		$this->currentPosition = $this->startingPosition;
 	}
 
-	public function reset(): void
+	public function reset(): self
 	{
+		$this->positions = [];
 		$this->currentPosition = $this->startingPosition;
-		$this->recorded = [];
-	}
 
-	public function flush(): array
-	{
-		$recorded = $this->recorded;
-		$this->recorded = [];
-
-		return $recorded;
-	}
-
-	public function forward(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$r = $this->rank() + $steps;
-		} else {
-			$r = $this->rank() - $steps;
-		}
-
-		return $this->record($this->positionWithCurrentFileAndRank($r), $allowIntermittentCollisions);
-	}
-
-	public function forwardRight(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$f = $this->file() + $steps;
-			$r = $this->rank() + $steps;
-		} else {
-			$f = $this->file() - $steps;
-			$r = $this->rank() - $steps;
-		}
-
-		return $this->record($this->positionWithFileAndRank($f, $r), $allowIntermittentCollisions);
-	}
-
-	public function forwardLeft(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$f = $this->file() - $steps;
-			$r = $this->rank() + $steps;
-		} else {
-			$f = $this->file() + $steps;
-			$r = $this->rank() - $steps;
-		}
-
-		return $this->record($this->positionWithFileAndRank($f, $r), $allowIntermittentCollisions);
-	}
-
-	public function backward(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$r = $this->rank() - $steps;
-		} else {
-			$r = $this->rank() + $steps;
-		}
-
-		return $this->record($this->positionWithCurrentFileAndRank($r), $allowIntermittentCollisions);
-	}
-
-	public function backwardRight(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$f = $this->file() + $steps;
-			$r = $this->rank() - $steps;
-		} else {
-			$f = $this->file() - $steps;
-			$r = $this->rank() + $steps;
-		}
-
-		return $this->record($this->positionWithFileAndRank($f, $r), $allowIntermittentCollisions);
-	}
-
-	public function backwardLeft(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
-	{
-		if (Color::WHITE == $this->color) {
-			$f = $this->file() - $steps;
-			$r = $this->rank() - $steps;
-		} else {
-			$f = $this->file() + $steps;
-			$r = $this->rank() + $steps;
-		}
-
-		return $this->record($this->positionWithFileAndRank($f, $r), $allowIntermittentCollisions);
+		return $this;
 	}
 
 	public function current(): ?Position
@@ -114,120 +28,177 @@ class BoardWalker
 		return $this->currentPosition;
 	}
 
-	public function left(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
+	public function flush(): array
 	{
+		$steps = $this->positions;
+		$this->positions = [];
+
+		return $steps;
+	}
+
+	public function forward(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$r = $this->rank() + $steps;
+		} else {
+			$r = $this->rank() - $steps;
+		}
+
+		return $this->record(
+			$this->positionWithCurrentFileAndRank($r),
+			$allowCapture,
+			$allowIntermittentCollisions
+		);
+	}
+
+	public function forwardRight(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$f = $this->file() + $steps;
+			$r = $this->rank() + $steps;
+		} else {
+			$f = $this->file() - $steps;
+			$r = $this->rank() - $steps;
+		}
+
+		return $this->record($this->positionWithFileAndRank($f, $r), $allowCapture, $allowIntermittentCollisions);
+	}
+
+	public function forwardLeft(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$f = $this->file() - $steps;
+			$r = $this->rank() + $steps;
+		} else {
+			$f = $this->file() + $steps;
+			$r = $this->rank() - $steps;
+		}
+
+		return $this->record($this->positionWithFileAndRank($f, $r), $allowCapture, $allowIntermittentCollisions);
+	}
+
+	public function backward(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$r = $this->rank() - $steps;
+		} else {
+			$r = $this->rank() + $steps;
+		}
+
+		return $this->record($this->positionWithCurrentFileAndRank($r), $allowCapture, $allowIntermittentCollisions);
+	}
+
+	public function backwardRight(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$f = $this->file() + $steps;
+			$r = $this->rank() - $steps;
+		} else {
+			$f = $this->file() - $steps;
+			$r = $this->rank() + $steps;
+		}
+
+		return $this->record($this->positionWithFileAndRank($f, $r), $allowCapture, $allowIntermittentCollisions);
+	}
+
+	public function backwardLeft(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
+		if (Color::WHITE == $this->color) {
+			$f = $this->file() - $steps;
+			$r = $this->rank() - $steps;
+		} else {
+			$f = $this->file() + $steps;
+			$r = $this->rank() + $steps;
+		}
+
+		return $this->record($this->positionWithFileAndRank($f, $r), $allowCapture, $allowIntermittentCollisions);
+	}
+
+	public function left(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
+	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
 		if (Color::WHITE == $this->color) {
 			$f = $this->file() - $steps;
 		} else {
 			$f = $this->file() + $steps;
 		}
 
-		return $this->record($this->positionWithFileAndCurrentRank($f), $allowIntermittentCollisions);
+		return $this->record($this->positionWithFileAndCurrentRank($f), $allowCapture, $allowIntermittentCollisions);
 	}
 
-	public function right(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
+	public function right(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
 	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
 		if (Color::WHITE == $this->color) {
 			$f = $this->file() + $steps;
 		} else {
 			$f = $this->file() - $steps;
 		}
 
-		return $this->record($this->positionWithFileAndCurrentRank($f), $allowIntermittentCollisions);
+		return $this->record($this->positionWithFileAndCurrentRank($f), $allowCapture, $allowIntermittentCollisions);
 	}
 
-	public function absoluteLeft(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
+	public function absoluteLeft(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
 	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
 		$f = $this->file() - $steps;
 
-		return $this->record($this->positionWithFileAndCurrentRank($f), $allowIntermittentCollisions);
+		return $this->record($this->positionWithFileAndCurrentRank($f), $allowCapture, $allowIntermittentCollisions);
 	}
 
-	public function absoluteRight(int $steps = 1, ?bool $allowIntermittentCollisions = null): self
+	public function absoluteRight(int $steps = 1, bool $allowCapture = false, bool $allowIntermittentCollisions = false): self
 	{
+		if (!$this->currentPosition) {
+			return $this;
+		}
+
 		$f = $this->file() + $steps;
 		$position = $this->positionWithFileAndCurrentRank($f);
 
-		return $this->record($position, $allowIntermittentCollisions);
+		return $this->record($position, $allowCapture, $allowIntermittentCollisions);
 	}
 
-	public function diagonals(MoveCollection $moveCollection): self
+	public function rank(): int
 	{
-		$startingColor = $this->board->pieceOn($this->startingPosition)->color;
-
-		while ($pos = $this->forwardLeft()->current()) {
-			if ($piece = $this->board->pieceOn($pos)) {
-				if ($piece->color !== $startingColor) {
-					$moveCollection->add(new MultiMove($this->startingPosition, $pos, $piece::class));
-				}
-
-				break;
-			} else {
-				$moveCollection->add(new SimpleMove($this->startingPosition, $pos));
-			}
-		}
-
-		$this->reset();
-
-		while ($pos = $this->forwardRight()->current()) {
-			if ($piece = $this->board->pieceOn($pos)) {
-				if ($piece->color !== $startingColor) {
-					$moveCollection->add(new MultiMove($this->startingPosition, $pos, $piece::class));
-				}
-
-				break;
-			} else {
-				$moveCollection->add(new SimpleMove($this->startingPosition, $pos));
-			}
-		}
-
-		while ($pos = $this->backwardLeft()->current()) {
-			if ($piece = $this->board->pieceOn($pos)) {
-				if ($piece->color !== $startingColor) {
-					$moveCollection->add(new MultiMove($this->startingPosition, $pos, $piece::class));
-				}
-
-				break;
-			} else {
-				$moveCollection->add(new SimpleMove($this->startingPosition, $pos));
-			}
-		}
-
-		$this->reset();
-
-		while ($pos = $this->backwardRight()->current()) {
-			if ($piece = $this->board->pieceOn($pos)) {
-				if ($piece->color !== $startingColor) {
-					$moveCollection->add(new MultiMove($this->startingPosition, $pos, $piece::class));
-				}
-
-				break;
-			} else {
-				$moveCollection->add(new SimpleMove($this->startingPosition, $pos));
-			}
-		}
-
-		$this->reset();
-
-		return $this;
+		return $this->currentPosition->rank();
 	}
 
-	private function rank(): ?int
+	public function file(): int
 	{
-		if (!$this->currentPosition) {
-			return null;
-		}
-
-		return substr($this->currentPosition->value, 1, 1);
-	}
-
-	private function file(): ?int
-	{
-		if (!$this->currentPosition) {
-			return null;
-		}
-
-		return substr($this->currentPosition->value, 0, 1);
+		return $this->currentPosition->file();
 	}
 
 	private function positionWithFileAndRank(int $file, int $rank): ?Position
@@ -245,23 +216,31 @@ class BoardWalker
 		return Position::tryFrom($this->file().$rank);
 	}
 
-	private function record(?Position $position, ?bool $allowIntermittentCollisions = null): self
+	private function record(?Position $position, bool $allowCapture, bool $allowIntermittentCollisions): self
 	{
-		if ($position && (
-			(!$this->allowIntermittentCollisions && (null == $allowIntermittentCollisions || false == $allowIntermittentCollisions))
-			&& $this->board->pieceOn($position)
-		)
+		$this->currentPosition = null;
+
+		if (!$position) {
+			return $this;
+		}
+
+		$piece = $this->board->pieceOn($position);
+
+		if (
+			!$piece
+			|| (
+				$piece
+				&& (
+					($allowCapture && $piece->color !== $this->color)
+					|| $allowIntermittentCollisions
+				)
+			)
 		) {
-			$position = null;
-		}
+			$this->positions[] = $position;
+			$this->currentPosition = $position;
 
-		if ($this->recording) {
-			if ($position) {
-				$this->recorded[] = $position;
-			}
+			return $this;
 		}
-
-		$this->currentPosition = $position;
 
 		return $this;
 	}

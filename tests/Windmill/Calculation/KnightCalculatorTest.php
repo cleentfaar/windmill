@@ -27,7 +27,7 @@ class KnightCalculatorTest extends AbstractCalculatorTest
 			],
 			[
 				'rnbq1rk1/pp2ppbp/2p2np1/8/2QPPB2/2N2N2/PP3PPP/R3KB1R b KQ e4 0 8',
-				['Nbd7', 'Nd5', 'Nxe4', 'Ng4', 'Nh5', 'Ne8'],
+				['Nfd7', 'Nd5', 'Nxe4', 'Ng4', 'Nh5', 'Ne8'],
 				Position::F6,
 			],
 		];

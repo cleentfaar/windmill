@@ -27,7 +27,7 @@ class AsciiBoardEncoderTest extends AbstractTestCase
 		return [
 			[
 				FENGameEncoder::STANDARD_FEN,
-"
+				'
 8  ♜  ♞  ♝  ♛  ♚  ♝  ♞  ♜ 
 7  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎ 
 6                         
@@ -37,7 +37,7 @@ class AsciiBoardEncoderTest extends AbstractTestCase
 2  ♙  ♙  ♙  ♙  ♙  ♙  ♙  ♙ 
 1  ♖  ♘  ♗  ♕  ♔  ♗  ♘  ♖ 
    A  B  C  D  E  F  G  H 
-",
+',
 			],
 		];
 	}

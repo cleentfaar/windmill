@@ -17,6 +17,6 @@ class BishopCalculator extends AbstractPieceCalculator
 		MoveCollection &$moveCollection
 	): void {
 		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
-		$walker->diagonals($moveCollection);
+		//		$walker->diagonals($moveCollection);
 	}
 }

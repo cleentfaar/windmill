@@ -97,7 +97,7 @@ class KingCalculator extends AbstractPieceCalculator
 			return;
 		}
 
-		$rookPosition = $walker->absoluteLeft(1, true)->current();
+		$rookPosition = $walker->absoluteLeft(1, false, true)->current();
 		$rook = $game->board->pieceOn($rookPosition);
 
 		if (!$rook || $rook->color != $game->currentColor() || Rook::class !== $rook::class) {
@@ -118,7 +118,7 @@ class KingCalculator extends AbstractPieceCalculator
 			return;
 		}
 
-		$rookPosition = $walker->absoluteRight(1, true)->current();
+		$rookPosition = $walker->absoluteRight(1, false, true)->current();
 
 		if (!$rookPosition) {
 			return;

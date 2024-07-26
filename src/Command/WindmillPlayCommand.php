@@ -78,7 +78,7 @@ class WindmillPlayCommand extends Command
 			$lastMoveSection->overwrite(sprintf(
 				'%s played: %s',
 				$game->currentColor()->name,
-				(new VerboseMoveEncoder())->encode($move, $game->board, $game->currentColor()),
+				(new VerboseMoveEncoder())->encode($move, $game),
 			));
 
 			$game->move($move);
@@ -91,7 +91,7 @@ class WindmillPlayCommand extends Command
 	{
 		$moves = $this->calculator->calculate($game);
 		$moveFENs = array_map(function (AbstractMove $move) use ($game) {
-			return $this->moveEncoder->encode($move, $game->board, $game->currentColor());
+			return $this->moveEncoder->encode($move, $game);
 		}, $moves->all());
 
 		$io = new SymfonyStyle($input, $section);

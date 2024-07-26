@@ -3,35 +3,39 @@
 namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
-use App\Windmill\Calculation\QueenCalculator;
+use App\Windmill\Calculation\KingCalculator;
 use App\Windmill\Color;
 use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Queen;
+use App\Windmill\Piece\King;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
-class QueenCalculatorTest extends AbstractCalculatorTest
+class KingCalculatorTest extends AbstractCalculatorTest
 {
 	protected function fenAndExpectedMovesProvider(): array
 	{
 		return [
-			[
+			'game start' => [
 				FENGameEncoder::STANDARD_FEN,
 				[],
 			],
-			[
-				'8/pppppppp/8/8/8/8/8/4Q3 w - d4 0 1',
-				['Qa1', 'Qa5', 'Qb1', 'Qb4', 'Qc1', 'Qc3', 'Qd1', 'Qd2', 'Qe2', 'Qe3', 'Qe4', 'Qe5', 'Qe6', 'Qf1', 'Qf2', 'Qg1', 'Qg3', 'Qh1', 'Qh4', 'Qxe7'],
+			'castling kingside' => [
+				'8/pppppppp/8/8/8/8/8/4K2R w KQ d4 0 1',
+				['Ke2', 'Kd1', 'Kf1', 'Kd2', 'Kf2', '0-0'],
+			],
+			'castling queenside' => [
+				'8/pppppppp/8/8/8/8/8/R3K3 w KQ d4 0 1',
+				['Ke2', 'Kd1', 'Kf1', 'Kd2', 'Kf2', '0-0-0'],
 			],
 		];
 	}
 
 	protected function createCalculator(): AbstractPieceCalculator
 	{
-		return new QueenCalculator();
+		return new KingCalculator();
 	}
 
 	protected function createPiece(Color $color): AbstractPiece
 	{
-		return new Queen($color);
+		return new King($color);
 	}
 }

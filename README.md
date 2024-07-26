@@ -39,16 +39,17 @@ Windmill is a highly extensible chess framework written in PHP, powered by [Symf
   - [x] Dig into previous incarnations of this project to get inspired
   - [x] Get familiar with the last 2 years of Symfony (and PHP) improvements.
 - Game fundamentals
+  - [x] Create initial proof of concept
   - [x] Create a baseline of tests that the framework should abide to
   - [x] Implement algorithm that adheres to this baseline
   - [x] Be able to represent the game visually
     - CLI:
-      - [x] Create initial proof of concept
-        - [x] Support FEN
-        - [x] Support PGN
-        - [x] Support SAN
-        - [x] Support ASCII
+      - [x] Support FEN
+      - [x] Support PGN
+      - [x] Support SAN
+      - [x] Support ASCII
     - Web App:
       - [ ] Provide the same functionality as the CLI, only now though a website
   - [ ] Create more complex scenarios, making sure the game logic deals with every possible case.
   - [ ] Add more engines besides 'Random'
+  - [ ] Support persisting games so they can be continued (and/or analysed) later

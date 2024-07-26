@@ -6,8 +6,10 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\Color;
 use App\Windmill\Game;
 use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\MoveCollection;
 use App\Windmill\Move\MultiMove;
 use App\Windmill\Move\SimpleMove;
+use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Queen;
@@ -37,9 +39,19 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 					$firstChar = '';
 				}
 
+				$moves = $this->calculator->calculateWithDestination($move->to, $game);
+
+				$uniqueFile = $this->encodeUniqueFile(
+					$movingPiece,
+					$move,
+					$moves,
+					$game
+				);
+
 				return sprintf(
-					'%s%s%s',
+					'%s%s%s%s',
 					$firstChar,
+					$uniqueFile,
 					$to->fileLetter(),
 					$to->rank()
 				);
@@ -72,32 +84,13 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 					$firstChar = $this->pieceEncoder->encode($game->board->pieceOn($move->from[0]), $move->from[0]);
 				}
 
-				$moves = $this->calculator->calculateWithDestination($move->to[0], $game)->all();
-
-				if (sizeof($moves) > 1 && !in_array($movingPiece::class, [Queen::class, King::class])) {
-					foreach ($moves as $m) {
-						switch ($m::class) {
-							case SimpleMove::class:
-								if ($game->board->pieceOn($m->from)::class == $movingPiece::class && $m->from !== $move->from[0]) {
-									$firstChar .= $move->from[0]->fileLetter();
-									break 2;
-								}
-
-								break;
-							case MultiMove::class:
-								if ($game->board->pieceOn($m->from[0])::class == $movingPiece::class && $m->from[0] !== $move->from[0]) {
-									$firstChar .= $move->from[0]->fileLetter();
-									break 2;
-								}
-
-								break;
-						}
-					}
-				}
+				$moves = $this->calculator->calculateWithDestination($move->to[0], $game);
+				$uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $moves, $game);
 
 				return sprintf(
-					'%sx%s%d',
+					'%s%sx%s%d',
 					$firstChar,
+					$uniqueFile,
 					$move->to[0]->fileLetter(),
 					$move->to[0]->rank()
 				);
@@ -124,5 +117,41 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 		}
 
 		return array_shift($possibleMoves);
+	}
+
+	private function encodeUniqueFile(AbstractPiece $movingPiece, AbstractMove $move, MoveCollection $moves, Game $game): string
+	{
+		$uniqueFile = '';
+
+		if (SimpleMove::class == $move::class) {
+			$moveFrom = $move->from;
+		} else {
+			$moveFrom = $move->from[0];
+		}
+
+		$moves = $moves->all();
+
+		if (sizeof($moves) > 1 && !in_array($movingPiece::class, [Queen::class, King::class])) {
+			foreach ($moves as $m) {
+				switch ($m::class) {
+					case SimpleMove::class:
+						if ($game->board->pieceOn($m->from)::class == $movingPiece::class && $m->from !== $moveFrom) {
+							$uniqueFile .= $moveFrom->fileLetter();
+							break 2;
+						}
+
+						break;
+					case MultiMove::class:
+						if ($game->board->pieceOn($m->from[0])::class == $movingPiece::class && $m->from[0] !== $moveFrom) {
+							$uniqueFile .= $moveFrom->fileLetter();
+							break 2;
+						}
+
+						break;
+				}
+			}
+		}
+
+		return $uniqueFile;
 	}
 }

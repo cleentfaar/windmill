@@ -71,13 +71,13 @@ class AsciiBoardEncoder implements BoardEncoderInterface
 	protected function getPieceSymbol(?AbstractPiece $piece): string
 	{
 		if ($piece) {
-            if ($piece->color == Color::WHITE && $this->solidWhite) {
-                $color = Color::BLACK;
-            } elseif ($piece->color == Color::BLACK && $this->hollowBlack) {
-                $color = Color::WHITE;
-            } else {
-                $color = $piece->color;
-            }
+			if (Color::WHITE == $piece->color && $this->solidWhite) {
+				$color = Color::BLACK;
+			} elseif (Color::BLACK == $piece->color && $this->hollowBlack) {
+				$color = Color::WHITE;
+			} else {
+				$color = $piece->color;
+			}
 
 			return sprintf(
 				' %s ',
