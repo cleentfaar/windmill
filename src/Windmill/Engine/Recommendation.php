@@ -2,11 +2,11 @@
 
 namespace App\Windmill\Engine;
 
-use App\Windmill\Move\MultiMove;
+use App\Windmill\Move\Move;
 
 class Recommendation
 {
-    public function __construct(public readonly MultiMove $move, public readonly int $confidence = 100)
+    public function __construct(public readonly Move $move, public readonly int $confidence = 100)
     {
     }
 }

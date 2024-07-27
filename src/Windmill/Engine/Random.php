@@ -5,7 +5,7 @@ namespace App\Windmill\Engine;
 use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\Game;
 
-class Random extends AbstractEngine
+class Random implements RecommendationEngineInterface
 {
     public function __construct(private readonly DelegatingCalculator $calculator)
     {
