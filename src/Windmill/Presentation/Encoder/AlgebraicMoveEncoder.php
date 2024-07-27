@@ -2,6 +2,7 @@
 
 namespace App\Windmill\Presentation\Encoder;
 
+use App\Windmill\Board;
 use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
@@ -11,6 +12,7 @@ use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
+use App\Windmill\Position;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
@@ -24,37 +26,39 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
     {
         switch ($move::class) {
             case SimpleMove::class:
-                $to = $move->to;
-                $movingPiece = $game->board->pieceOn($move->from);
-
-                if (!$movingPiece) {
-                    throw new \Exception(sprintf('There is no piece to move from that position: %s', $move->from->name));
-                }
-
-                $firstChar = $this->encodePiece($movingPiece, $move);
-
-                $uniqueFile = $this->encodeUniqueFile(
-                    $movingPiece,
-                    $move,
-                    $game
-                );
-
-                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
-
-                return sprintf(
-                    '%s%s%s%s%s',
-                    $firstChar,
-                    $uniqueFile,
-                    $to->fileLetter(),
-                    $to->rank(),
-                    $checksOrCheckmates
-                );
+//                $to = $move->to;
+//                $movingPiece = $game->board->pieceOn($move->from);
+//
+//                if (!$movingPiece) {
+//                    throw new \Exception(sprintf('There is no piece to move from that position: %s', $move->from->name));
+//                }
+//
+//                $firstChar = $this->encodeMovingPieceChar($move->from, $move->to, $game->board);
+//
+//                $uniqueFile = $this->encodeUniqueFile(
+//                    $movingPiece,
+//                    $move,
+//                    $game
+//                );
+//
+//                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
+//
+//                return sprintf(
+//                    '%s%s%s%s%s',
+//                    $firstChar,
+//                    $uniqueFile,
+//                    $to->fileLetter(),
+//                    $to->rank(),
+//                    $checksOrCheckmates
+//                );
             case MultiMove::class:
-                $movingPiece = $game->board->pieceOn($move->from[0]);
+                $moveFrom = $move::class == MultiMove::class ? $move->from[0] : $move->from;
+                $moveTo = $move::class == MultiMove::class ? $move->to[0] : $move->to;
+                $movingPiece = $game->board->pieceOn($moveFrom);
 
-                if (King::class == $movingPiece::class && abs($move->from[0]->file() - $move->to[0]->file()) > 1) {
+                if (King::class == $movingPiece::class && abs($moveFrom->file() - $moveTo->file()) > 1) {
                     // castling
-                    $jumpSize = abs($move->from[0]->file() - $move->to[0]->file());
+                    $jumpSize = abs($moveFrom->file() - $moveTo->file());
 
                     if ($jumpSize > 3) {
                         return '0-0-0';
@@ -63,21 +67,19 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
                     }
                 }
 
-                if (Pawn::class == $movingPiece::class) {
-                    $firstChar = $move->from[0]->fileLetter();
-                } else {
-                    $firstChar = $this->pieceEncoder->encode($game->board->pieceOn($move->from[0]), $move->from[0]);
-                }
-
+                $isCapture = ($move::class == MultiMove::class) ? (sizeof($move->to) > 1 && sizeof(array_filter($move->to)) == 1) : $game->board->pieceOn($move->to);
+                $captureablePiecePosition = $isCapture ? ($move->from[1] == $move->to[0] ? $move->to[0] : $move->from[1]) : $move->to;
+                $firstChar = $this->encodeMovingPieceChar($moveFrom, $captureablePiecePosition, $game->board);
                 $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $game);
                 $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
 
                 return sprintf(
-                    '%s%sx%s%d%s',
+                    '%s%s%s%s%d%s',
                     $firstChar,
                     $uniqueFile,
-                    $move->to[0]->fileLetter(),
-                    $move->to[0]->rank(),
+                    $isCapture ? 'x': '',
+                    $moveTo->fileLetter(),
+                    $moveTo->rank(),
                     $checksOrCheckmates
                 );
             default:
@@ -133,5 +135,20 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         }
 
         return '';
+    }
+
+    private function encodeMovingPieceChar(Position $from, Position $captureablePiecePosition, Board $board): string
+    {
+        $piece = $board->pieceOn($from);
+
+        if (Pawn::class == $piece::class) {
+            if ($board->pieceOn($captureablePiecePosition)) {
+                return $from->fileLetter();
+            }
+
+            return '';
+        }
+
+        return $this->pieceEncoder->encode($piece, $from);
     }
 }
