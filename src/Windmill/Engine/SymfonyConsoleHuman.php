@@ -32,9 +32,9 @@ class SymfonyConsoleHuman implements RecommendationEngineInterface
     private function askForNextMove(Game $game, InputInterface $input, ConsoleSectionOutput $section): Move
     {
         $moves = $this->calculator->calculate($game);
-        $moveFENs = array_map(function (Move $move) use ($game) {
+        $moveFENs = $moves->map(function (Move $move) use ($game) {
             return $this->moveEncoder->encode($move, $game);
-        }, $moves->all());
+        });
 
         $io = new SymfonyStyle($input, $section);
         $question = $this->createMoveQuestion($game, $moveFENs);

@@ -55,7 +55,7 @@ class WindmillReplayCommand extends Command
         $backupGame = $backupReplay->game;
         $gameEncoder = new FENGameEncoder();
 
-        foreach ($replay->moves->all() as $move) {
+        foreach ($replay->moves as $move) {
             $currentColor = $game->currentColor();
             $game->move($move);
             if ($input->getOption('fen-only')) {

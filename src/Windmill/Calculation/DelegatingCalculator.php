@@ -66,7 +66,7 @@ class DelegatingCalculator
         }
 
         $moveCollection = $this->calculate($clone);
-        $movesAttackingKing = $moveCollection->to($squaresWithOppositeKing[0])->all();
+        $movesAttackingKing = $moveCollection->to($squaresWithOppositeKing[0]);
 
         if (0 == sizeof($movesAttackingKing)) {
             return CheckState::NONE;
@@ -103,7 +103,7 @@ class DelegatingCalculator
 
     public function calculcateMultiplePiecesWithDestination(string $pieceClass, Position $destination, Game $game): bool
     {
-        $moves = $this->calculate($game)->to($destination)->all();
+        $moves = $this->calculate($game)->to($destination);
         $eligible = [];
 
         foreach ($moves as $m) {

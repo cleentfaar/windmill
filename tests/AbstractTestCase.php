@@ -49,7 +49,7 @@ abstract class AbstractTestCase extends TestCase
         $encoder = new AlgebraicMoveEncoder();
         $moves = [];
 
-        foreach ($moveCollection->all() as $move) {
+        foreach ($moveCollection as $move) {
             $moves[] = $encoder->encode($move, $game);
         }
 

@@ -13,9 +13,8 @@ class Random implements RecommendationEngineInterface
 
     public function recommend(Game $game): Recommendation
     {
-        $moves = $this->calculator->calculate($game)->all();
-        $key = array_rand($moves, 1);
+        $move = $this->calculator->calculate($game)->pickRandom();
 
-        return new Recommendation($moves[$key], rand(1, 100));
+        return new Recommendation($move, rand(1, 100));
     }
 }

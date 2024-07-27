@@ -2,7 +2,7 @@
 
 namespace App\Windmill;
 
-class MoveCollection
+class MoveCollection implements \IteratorAggregate, \Countable
 {
     public function __construct(private array $moves = [])
     {
@@ -23,8 +23,25 @@ class MoveCollection
         }));
     }
 
-    public function all(): array
+    public function pickRandom(): ?Move
     {
-        return $this->moves;
+        $key = array_rand($this->moves);
+
+        return $this->moves[$key] ?? null;
+    }
+
+    public function map(callable $callback): array
+    {
+        return array_map($callback, $this->moves);
+    }
+
+    public function getIterator(): \Generator
+    {
+        yield from $this->moves;
+    }
+
+    public function count(): int
+    {
+        return sizeof($this->moves);
     }
 }
