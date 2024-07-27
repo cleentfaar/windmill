@@ -13,8 +13,6 @@ use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Queen;
-use App\Windmill\Position;
-use DeepCopy\DeepCopy;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
@@ -50,7 +48,6 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
                     $game
                 );
 
-                $checksOrCheckmates = '';
                 $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
 
                 return sprintf(
@@ -83,15 +80,14 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
                 $moves = $this->calculator->calculateWithDestination($move->from[0], $game);
                 $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $moves, $game);
-                $checksOrCheckmates = '';
                 $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
 
                 return sprintf(
                     '%s%sx%s%d%s',
                     $firstChar,
                     $uniqueFile,
-                    $move->from[1]->fileLetter(),
-                    $move->from[1]->rank(),
+                    $move->to[0]->fileLetter(),
+                    $move->to[0]->rank(),
                     $checksOrCheckmates
                 );
             default:
@@ -140,12 +136,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     private function encodeChecksOrCheckmatesOpponent(AbstractPiece $movingPiece, AbstractMove $move, Game $game): string
     {
-        /* @var Game $clone */
-        $clone = (new DeepCopy())->copy($game);
-        if (SimpleMove::class == $move::class && Position::D3 == $move->from) {
-            dump(spl_object_id($game->board), spl_object_id($clone->board));
-            exit;
-        }
+        $clone = clone $game;
         $clone->move($move, true);
         $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
 
@@ -154,12 +145,9 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         }
 
         $moveCollection = $this->calculator->calculateWithDestination($squaresWithOppositeKing[0], $clone);
-        $moveTo = SimpleMove::class == $move::class ? $move->to : $move->to[0];
 
         foreach ($moveCollection->all() as $m) {
-            if ($m->from[0] == $moveTo && $clone->board->pieceOn($m->from[0])::class == $movingPiece::class) {
-                return '+';
-            }
+            return '+';
         }
 
         return '';

@@ -20,11 +20,11 @@ class BishopCalculatorTest extends AbstractCalculatorTest
             ],
             'move multiple squares diagonally' => [
                 '4k3/8/8/8/8/8/4B3/4K2R w KQ d4 0 1',
-                ['Bd3', 'Bc4', 'Bb5', 'Ba6', 'Bf3', 'Bg4', 'Bh5', 'Bf1', 'Bd1'],
+                ['Bd3', 'Bc4', 'Bb5+', 'Ba6', 'Bf3', 'Bg4', 'Bh5+', 'Bf1', 'Bd1'],
             ],
             'capture across multiple squares diagonally' => [
                 '4k3/8/8/pppppppp/8/8/4B3/4K2R w KQ d4 0 1',
-                ['Bd3', 'Bc4', 'Bxb5', 'Bf3', 'Bg4', 'Bxh5', 'Bf1', 'Bd1'],
+                ['Bd3', 'Bc4', 'Bxb5+', 'Bf3', 'Bg4', 'Bxh5+', 'Bf1', 'Bd1'],
             ],
         ];
     }

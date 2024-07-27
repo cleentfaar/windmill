@@ -19,8 +19,8 @@ class QueenCalculatorTest extends AbstractCalculatorTest
                 [],
             ],
             [
-                '8/pppppppp/8/8/8/8/8/4Q3 w - d4 0 1',
-                ['Qa1', 'Qa5', 'Qb1', 'Qb4', 'Qc1', 'Qc3', 'Qd1', 'Qd2', 'Qe2', 'Qe3', 'Qe4', 'Qe5', 'Qe6', 'Qf1', 'Qf2', 'Qg1', 'Qg3', 'Qh1', 'Qh4', 'Qxe7'],
+                '3k4/pppppppp/8/8/8/8/8/3KQ3 w - d4 0 1',
+                ['Qa5', 'Qb4', 'Qc3', 'Qd2', 'Qe2', 'Qe3', 'Qe4', 'Qe5', 'Qe6', 'Qf1', 'Qf2', 'Qg1', 'Qg3', 'Qh1', 'Qh4', 'Qxe7+'],
             ],
         ];
     }

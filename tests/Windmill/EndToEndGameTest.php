@@ -61,6 +61,14 @@ class EndToEndGameTest extends AbstractTestCase
                 ['Bc4', 'r4rk1/pp2Bpbp/1qp3p1/8/2BPn1b1/Q1P2N2/P4PPP/3RK2R b KQ e4 2 15'],
                 ['Nxc3', 'r4rk1/pp2Bpbp/1qp3p1/8/2BP2b1/Q1n2N2/P4PPP/3RK2R w KQ e4 0 16'],
                 ['Bc5', 'r4rk1/pp3pbp/1qp3p1/2B5/2BP2b1/Q1n2N2/P4PPP/3RK2R b KQ e4 1 16'],
+                ['Rfe8+', 'r3r1k1/pp3pbp/1qp3p1/2B5/2BP2b1/Q1n2N2/P4PPP/3RK2R w KQ e4 2 17'],
+                ['Kf1', 'r3r1k1/pp3pbp/1qp3p1/2B5/2BP2b1/Q1n2N2/P4PPP/3R1K1R b KQ e4 3 17'],
+                ['Be6', 'r3r1k1/pp3pbp/1qp1b1p1/2B5/2BP4/Q1n2N2/P4PPP/3R1K1R w KQ e4 4 18'],
+                ['Bxb6', 'r3r1k1/pp3pbp/1Bp1b1p1/8/2BP4/Q1n2N2/P4PPP/3R1K1R b KQ e4 0 18'],
+                ['Bxc4+', 'r3r1k1/pp3pbp/1Bp3p1/8/2bP4/Q1n2N2/P4PPP/3R1K1R w KQ e4 0 19'],
+                ['Kg1', 'r3r1k1/pp3pbp/1Bp3p1/8/2bP4/Q1n2N2/P4PPP/3R2KR b KQ e4 1 19'],
+                ['Ne2+', 'r3r1k1/pp3pbp/1Bp3p1/8/2bP4/Q4N2/P3nPPP/3R2KR w KQ e4 2 20'],
+                ['Kf1', 'r3r1k1/pp3pbp/1Bp3p1/8/2bP4/Q4N2/P3nPPP/3R1K1R b KQ e4 3 20'],
             ],
         ];
     }

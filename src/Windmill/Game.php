@@ -86,6 +86,9 @@ class Game
                 break;
             case MultiMove::class:
                 foreach ($move->from as $x => $from) {
+                    if (!$this->board->pieceOn($from)) {
+                        dump($from);
+                    }
                     if (King::class == $this->board->pieceOn($from)::class && abs($move->from[$x]->file() - $move->to[$x]->file()) > 1) {
                         // castle
                         if (Color::WHITE == $this->currentColor()) {

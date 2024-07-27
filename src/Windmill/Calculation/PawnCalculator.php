@@ -102,7 +102,7 @@ class PawnCalculator extends AbstractPieceCalculator
             if ($destination == $enPassantTarget) {
                 $enPassantWalker = new BoardWalker($enPassantTarget, Color::oppositeOf($currentColor), $game->board);
                 $positionOfPieceToCapture = $enPassantWalker->forward(1, false, true)->current();
-                $moveCollection->add(new MultiMove([$currentPosition, $enPassantTarget], [$positionOfPieceToCapture, null]));
+                $moveCollection->add(new MultiMove([$currentPosition, $positionOfPieceToCapture], [$enPassantTarget, null]));
             }
         }
     }

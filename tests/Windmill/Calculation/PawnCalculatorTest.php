@@ -7,6 +7,7 @@ use App\Windmill\Calculation\PawnCalculator;
 use App\Windmill\Color;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\Pawn;
+use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
 class PawnCalculatorTest extends AbstractCalculatorTest
@@ -25,6 +26,11 @@ class PawnCalculatorTest extends AbstractCalculatorTest
             'en passant' => [
                 '4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1',
                 ['e6', 'exd6'],
+            ],
+            'check king' => [
+                '8/8/8/4k3/8/3P4/8/4K3 w - - 0 1',
+                ['d4+'],
+                Position::D3,
             ],
         ];
     }
