@@ -125,9 +125,6 @@ class Board
                 $this->squares[$move->to->value] = $piece;
                 break;
             case MultiMove::class:
-                if ('castle' == $move->comment) {
-                    //                    dump($move);
-                }
                 foreach ($move->to as $x => $to) {
                     if (null == $to) {
                         $from = $move->from[$x];
@@ -146,9 +143,6 @@ class Board
 
                         $this->squares[$from->value] = null;
                     }
-                }
-                if ('castle' == $move->comment) {
-                    //                    dump($this->squares);exit;
                 }
                 break;
             default:

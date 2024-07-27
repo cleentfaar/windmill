@@ -3,16 +3,14 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Calculation\DelegatingCalculator;
-use App\Windmill\Color;
+use App\Windmill\CheckState;
 use App\Windmill\Game;
 use App\Windmill\Move\AbstractMove;
-use App\Windmill\Move\MoveCollection;
 use App\Windmill\Move\MultiMove;
 use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Queen;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
@@ -33,22 +31,15 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
                     throw new \Exception(sprintf('There is no piece to move from that position: %s', $move->from->name));
                 }
 
-                if (Pawn::class != $movingPiece::class) {
-                    $firstChar = $this->pieceEncoder->encode($movingPiece, $move->from);
-                } else {
-                    $firstChar = '';
-                }
-
-                $moves = $this->calculator->calculateWithDestination($move->to, $game);
+                $firstChar = $this->encodePiece($movingPiece, $move);
 
                 $uniqueFile = $this->encodeUniqueFile(
                     $movingPiece,
                     $move,
-                    $moves,
                     $game
                 );
 
-                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
+                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
 
                 return sprintf(
                     '%s%s%s%s%s',
@@ -78,9 +69,8 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
                     $firstChar = $this->pieceEncoder->encode($game->board->pieceOn($move->from[0]), $move->from[0]);
                 }
 
-                $moves = $this->calculator->calculateWithDestination($move->from[0], $game);
-                $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $moves, $game);
-                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
+                $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $game);
+                $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
 
                 return sprintf(
                     '%s%sx%s%d%s',
@@ -115,39 +105,31 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         return array_shift($possibleMoves);
     }
 
-    private function encodeUniqueFile(AbstractPiece $movingPiece, AbstractMove $move, MoveCollection $moves, Game $game): string
+    private function encodeUniqueFile(AbstractPiece $movingPiece, AbstractMove $move, Game $game): string
     {
-        $uniqueFile = '';
-        $moveFrom = SimpleMove::class == $move::class ? $move->from : $move->from[0];
-        $moves = $moves->all();
-
-        if (sizeof($moves) > 1 && !in_array($movingPiece::class, [Queen::class, King::class])) {
-            foreach ($moves as $m) {
-                $mFrom = SimpleMove::class == $m::class ? $m->from : $m->from[0];
-                if ($game->board->pieceOn($mFrom)::class == $movingPiece::class && $mFrom !== $moveFrom) {
-                    $uniqueFile .= $moveFrom->fileLetter();
-                    break;
-                }
-            }
+        if ($this->calculator->calculcateMultiplePiecesWithDestination(
+            $movingPiece::class,
+            SimpleMove::class == $move::class ? $move->to : $move->to[0], $game
+        )) {
+            return (SimpleMove::class == $move::class ? $move->from : $move->from[0])->fileLetter();
         }
 
-        return $uniqueFile;
+        return '';
     }
 
-    private function encodeChecksOrCheckmatesOpponent(AbstractPiece $movingPiece, AbstractMove $move, Game $game): string
+    private function encodeChecksOrCheckmatesOpponent(AbstractMove $move, Game $game): string
     {
-        $clone = clone $game;
-        $clone->move($move, true);
-        $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
+        return match ($this->calculator->calculcateCheckState($move, $game)) {
+            CheckState::CHECK => '+',
+            CheckState::CHECKMATE => '#',
+            default => '',
+        };
+    }
 
-        if (1 != sizeof($squaresWithOppositeKing)) {
-            throw new \Exception(sprintf('Expected a single square to be occupied, got %d', sizeof($squaresWithOppositeKing)));
-        }
-
-        $moveCollection = $this->calculator->calculateWithDestination($squaresWithOppositeKing[0], $clone);
-
-        foreach ($moveCollection->all() as $m) {
-            return '+';
+    public function encodePiece(AbstractPiece $movingPiece, SimpleMove $move): string
+    {
+        if (Pawn::class != $movingPiece::class) {
+            return $this->pieceEncoder->encode($movingPiece, $move->from);
         }
 
         return '';

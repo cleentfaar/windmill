@@ -53,6 +53,7 @@ class AsciiBoardEncoder implements BoardEncoderInterface
                 $piece = $board->pieceOn($position);
                 $output .= $this->renderPieceSymbol($position, $piece);
             }
+
             $output .= "\n";
         }
 
