@@ -83,7 +83,7 @@ class Game
         foreach ($move->from as $from) {
             if (King::class == $this->board->pieceOn($from)::class && $move->fileDifference() > 1) {
                 // castle
-                if (Color::WHITE == $this->currentColor()) {
+                if (Color::WHITE == $this->colorToMove) {
                     $this->castlingAvailability->whiteCanCastleQueenside = false;
                     $this->castlingAvailability->whiteCanCastleKingside = false;
                 } else {
@@ -94,7 +94,7 @@ class Game
         }
 
         foreach ($move->to as $x => $to) {
-            if (null == $to && $this->board->pieceOn($move->from[$x])->color != $this->currentColor()) {
+            if (null == $to && $this->board->pieceOn($move->from[$x])->color != $this->colorToMove) {
                 // capture
                 $halfMoveReset = true;
             }

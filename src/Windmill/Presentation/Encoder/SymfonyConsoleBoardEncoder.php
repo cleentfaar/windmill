@@ -12,10 +12,10 @@ class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
         private readonly bool $solidWhite = true,
         private readonly bool $hollowBlack = false,
         private readonly string $spacingCharacter = ' ',
-        private readonly string $whiteFg = '',
-        private readonly string $whiteBg = '',
-        private readonly string $blackFg = '',
-        private readonly string $blackBg = '',
+        private readonly string $whiteFg = '#EADDCA',
+        private readonly string $whiteBg = '#DAA06D',
+        private readonly string $blackFg = '#5C4033',
+        private readonly string $blackBg = '#964B00',
     ) {
         parent::__construct(
             $this->solidWhite,

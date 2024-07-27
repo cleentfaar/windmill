@@ -4,6 +4,7 @@ namespace App\Windmill\Presentation\Encoder;
 
 use AmyBoyd\PgnParser\Game as PgnGame;
 use AmyBoyd\PgnParser\PgnParser;
+use App\Windmill\Engine\Random;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\MoveCollection;
@@ -50,9 +51,9 @@ class PgnReplayEncoder implements ReplayEncoderInterface
     {
         return GameFactory::standard(
             $parsedGame->getWhite(),
-            null,
+            new Random(),
             $parsedGame->getBlack(),
-            null,
+            new Random(),
         );
     }
 }

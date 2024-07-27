@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use App\Windmill\Board;
 use App\Windmill\Color;
+use App\Windmill\Engine\Random;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\MoveCollection;
@@ -17,8 +18,8 @@ abstract class AbstractTestCase extends TestCase
     protected static function createGameFromFEN(string $FEN, ?string $engine = null): Game
     {
         return GameFactory::createFromFEN(
-            new Player(Color::WHITE, 'tester1', $engine),
-            new Player(Color::BLACK, 'tester2', $engine),
+            new Player(Color::WHITE, 'tester1', new Random()),
+            new Player(Color::BLACK, 'tester2', new Random()),
             $FEN,
         );
     }
