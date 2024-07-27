@@ -2,9 +2,9 @@
 
 namespace App\Command;
 
+use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 use App\Windmill\Presentation\Encoder\PgnReplayEncoder;
-use App\Windmill\Presentation\Encoder\SANMoveEncoder;
 use App\Windmill\Presentation\Encoder\SymfonyConsoleBoardEncoder;
 use App\Windmill\Presentation\Encoder\VerboseMoveEncoder;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -61,7 +61,7 @@ class WindmillReplayCommand extends Command
             if ($input->getOption('fen-only')) {
                 $output->writeln(sprintf(
                     '[\'%s\', \'%s\'],',
-                    (new SANMoveEncoder())->encode($move, $backupGame),
+                    (new AlgebraicMoveEncoder())->encode($move, $backupGame),
                     $gameEncoder->encode($game)
                 ));
 
@@ -71,7 +71,7 @@ class WindmillReplayCommand extends Command
                     '%s played: %s (SEN: %s, FEN: %s)',
                     $currentColor->name,
                     (new VerboseMoveEncoder())->encode($move, $backupGame),
-                    (new SANMoveEncoder())->encode($move, $backupGame),
+                    (new AlgebraicMoveEncoder())->encode($move, $backupGame),
                     $gameEncoder->encode($game)
                 ));
 

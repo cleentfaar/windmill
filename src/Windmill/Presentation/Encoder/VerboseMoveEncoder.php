@@ -8,9 +8,13 @@ use App\Windmill\Piece\Pawn;
 
 class VerboseMoveEncoder implements MoveEncoderInterface
 {
+    private const array VERBOSE_MOVE_FIELDS = [
+        'piece' => 0,
+    ];
+
     public function __construct(
         private readonly AlgebraicMoveEncoder $moveEncoder = new AlgebraicMoveEncoder(),
-        private readonly SANPieceEncoder $pieceEncoder = new SANPieceEncoder(),
+        private readonly AlgebraicPieceEncoder $pieceEncoder = new AlgebraicPieceEncoder(),
     ) {
     }
 
@@ -52,5 +56,6 @@ class VerboseMoveEncoder implements MoveEncoderInterface
 
     public function decode(mixed $algebraic, Game $game): Move
     {
+        throw new \Exception(sprintf('Decoding not supported by this class (%s)', __CLASS__));
     }
 }

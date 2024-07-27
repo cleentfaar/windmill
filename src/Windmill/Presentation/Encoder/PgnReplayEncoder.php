@@ -11,7 +11,7 @@ use App\Windmill\Presentation\Replay;
 
 class PgnReplayEncoder implements ReplayEncoderInterface
 {
-    public function __construct(private readonly MoveEncoderInterface $moveEncoder = new SANMoveEncoder())
+    public function __construct(private readonly MoveEncoderInterface $moveEncoder = new AlgebraicMoveEncoder())
     {
     }
 

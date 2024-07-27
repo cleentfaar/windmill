@@ -3,8 +3,8 @@
 namespace App\Tests\Windmill;
 
 use App\Tests\AbstractTestCase;
+use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
-use App\Windmill\Presentation\Encoder\SANMoveEncoder;
 
 class EndToEndGameTest extends AbstractTestCase
 {
@@ -15,7 +15,7 @@ class EndToEndGameTest extends AbstractTestCase
         string $startingFEN,
         array ...$movesAndResultingStates
     ): void {
-        $moveEncoder = new SANMoveEncoder();
+        $moveEncoder = new AlgebraicMoveEncoder();
         $gameEncoder = new FENGameEncoder();
         $game = self::createGameFromFEN($startingFEN);
 

@@ -15,7 +15,7 @@ use App\Windmill\Position;
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
     public function __construct(
-        private readonly PieceEncoderInterface $pieceEncoder = new SANPieceEncoder(),
+        private readonly AlgebraicPieceEncoder $pieceEncoder = new AlgebraicPieceEncoder(),
         private readonly DelegatingCalculator $calculator = new DelegatingCalculator()
     ) {
     }
@@ -30,7 +30,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
             // castling
             $jumpSize = abs($moveFrom->file() - $moveTo->file());
 
-            if ($jumpSize > 3) {
+            if ($jumpSize > 2) {
                 return '0-0-0';
             } else {
                 return '0-0';

@@ -12,23 +12,23 @@ use App\Windmill\Piece\Queen;
 use App\Windmill\Piece\Rook;
 use App\Windmill\Position;
 
-class FENPieceEncoder implements PieceEncoderInterface
+class AlgebraicPieceEncoder implements PieceEncoderInterface
 {
     public function encode(AbstractPiece $decodedPiece, Position $position): string
     {
         switch ($decodedPiece::class) {
-            case Pawn::class:
-                return Color::WHITE == $decodedPiece->color ? 'P' : 'p';
             case Bishop::class:
-                return Color::WHITE == $decodedPiece->color ? 'B' : 'b';
+                return 'B';
             case Knight::class:
-                return Color::WHITE == $decodedPiece->color ? 'N' : 'n';
+                return 'N';
             case Rook::class:
-                return Color::WHITE == $decodedPiece->color ? 'R' : 'r';
+                return 'R';
             case Queen::class:
-                return Color::WHITE == $decodedPiece->color ? 'Q' : 'q';
+                return 'Q';
             case King::class:
-                return Color::WHITE == $decodedPiece->color ? 'K' : 'k';
+                return 'K';
+            case Pawn::class:
+                return $position->fileLetter();
             default:
                 throw new \Exception(sprintf('Unsupported piece: %s', $decodedPiece::class));
         }
@@ -36,23 +36,30 @@ class FENPieceEncoder implements PieceEncoderInterface
 
     public function decode(string $encodedPiece, Color $color): AbstractPiece
     {
-        $color = ctype_upper($encodedPiece) ? Color::WHITE : Color::BLACK;
-
-        switch (mb_strtolower($encodedPiece)) {
-            case 'p':
-                return new Pawn($color);
-            case 'b':
+        switch ($encodedPiece) {
+            case 'B':
                 return new Bishop($color);
-            case 'n':
+            case 'N':
                 return new Knight($color);
-            case 'r':
+            case 'R':
                 return new Rook($color);
-            case 'q':
+            case 'Q':
                 return new Queen($color);
-            case 'k':
+            case 'K':
+            case '0':
+            case 'O':
                 return new King($color);
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+                return new Pawn($color);
             default:
-                throw new \Exception(sprintf('Unsupported algebraic piece: %s', $encodedPiece));
+                throw new \Exception(sprintf('Unsupported SAN piece: %s', $encodedPiece));
         }
     }
 }

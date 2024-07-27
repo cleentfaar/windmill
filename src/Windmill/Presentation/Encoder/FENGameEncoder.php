@@ -6,6 +6,7 @@ use App\Windmill\Board;
 use App\Windmill\CastlingAvailability;
 use App\Windmill\Color;
 use App\Windmill\Game;
+use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\Bishop;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Knight;
@@ -28,11 +29,6 @@ class FENGameEncoder implements GameEncoderInterface
         'halfmove clock' => 4,
         'fullmove clock' => 5,
     ];
-
-    public function __construct(
-        private readonly FENPieceEncoder $pieceEncoder = new FENPieceEncoder(),
-    ) {
-    }
 
     public function encode(Game $game): string
     {
@@ -120,7 +116,7 @@ class FENGameEncoder implements GameEncoderInterface
                 if ($piece = $game->board->pieceOn($position)) {
                     $output .= $emptyCounter > 0 ? $emptyCounter : '';
                     $emptyCounter = 0;
-                    $output .= $this->pieceEncoder->encode($piece, $position);
+                    $output .= $this->encodePiece($piece);
                 } else {
                     ++$emptyCounter;
                 }
@@ -234,5 +230,18 @@ class FENGameEncoder implements GameEncoderInterface
     private function decodeFullMoveClock(string $encodedGame): int
     {
         return (int) explode(' ', $encodedGame)[self::FEN_FIELDS['fullmove clock']];
+    }
+
+    private function encodePiece(AbstractPiece $piece): string
+    {
+        return match ($piece::class) {
+            Pawn::class => Color::WHITE == $piece->color ? 'P' : 'p',
+            Bishop::class => Color::WHITE == $piece->color ? 'B' : 'b',
+            Knight::class => Color::WHITE == $piece->color ? 'N' : 'n',
+            Rook::class => Color::WHITE == $piece->color ? 'R' : 'r',
+            Queen::class => Color::WHITE == $piece->color ? 'Q' : 'q',
+            King::class => Color::WHITE == $piece->color ? 'K' : 'k',
+            default => throw new \Exception(sprintf('Unsupported piece: %s', $piece::class)),
+        };
     }
 }

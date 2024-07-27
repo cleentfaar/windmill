@@ -8,8 +8,8 @@ use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\MoveCollection;
 use App\Windmill\Player;
+use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\AsciiBoardEncoder;
-use App\Windmill\Presentation\Encoder\SANMoveEncoder;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractTestCase extends TestCase
@@ -45,7 +45,7 @@ abstract class AbstractTestCase extends TestCase
 
     protected static function encodeMovesToSANs(MoveCollection $moveCollection, Game $game): array
     {
-        $encoder = new SANMoveEncoder();
+        $encoder = new AlgebraicMoveEncoder();
         $moves = [];
 
         foreach ($moveCollection->all() as $move) {
