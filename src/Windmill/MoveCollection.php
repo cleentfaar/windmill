@@ -13,19 +13,19 @@ class MoveCollection
         $this->moves[] = $move;
     }
 
-    public function from(Position $position): array
+    public function to(Position $to): MoveCollection
     {
-        return array_filter($this->moves, function (Move $m) use ($position) {
+        return new MoveCollection(array_filter($this->moves, function (Move $m) use ($to) {
             return in_array(
-                $position->value,
-                array_map(
-                    function (Position $from) {
-                        return $from->value;
-                    },
-                    $m->from()
-                )
+                $to,
+                $m->to
             );
-        });
+        }));
+    }
+
+    public function filter(callable $callback): MoveCollection
+    {
+        return new MoveCollection(array_filter($this->moves, $callback));
     }
 
     public function all(): array

@@ -53,40 +53,6 @@ class DelegatingCalculator
         return $moveCollection;
     }
 
-    public function calculateWithDestination(Position $to, Game $game)
-    {
-        $remaining = new MoveCollection();
-
-        foreach ($this->calculate($game)->all() as $move) {
-            switch ($move::class) {
-                case Move::class:
-                    foreach ($move->to as $toInMove) {
-                        if ($toInMove == $to) {
-                            $remaining->add($move);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        return $remaining;
-    }
-
-    public function calculateWithSource(Position $position, Game $game): MoveCollection
-    {
-        $moves = new MoveCollection();
-
-        foreach ($this->calculate($game)->all() as $move) {
-            $moveFrom = $move->from[0];
-
-            if ($moveFrom == $position) {
-                $moves->add($move);
-            }
-        }
-
-        return $moves;
-    }
-
     public function calculcateCheckState(Move $move, Game $game): CheckState
     {
         $moveFrom = $move->from[0];
@@ -96,10 +62,11 @@ class DelegatingCalculator
         $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
 
         if (1 != sizeof($squaresWithOppositeKing)) {
-            throw new \Exception(sprintf('Expected a single square to be occupied, got %d', sizeof($squaresWithOppositeKing)));
+            throw new \Exception(sprintf('Expected a single square to be occupied by the king, got %d', sizeof($squaresWithOppositeKing)));
         }
 
-        $movesAttackingKing = $this->calculateWithDestination($squaresWithOppositeKing[0], $clone)->all();
+        $moveCollection = $this->calculate($clone);
+        $movesAttackingKing = $moveCollection->to($squaresWithOppositeKing[0])->all();
 
         if (0 == sizeof($movesAttackingKing)) {
             return CheckState::NONE;
@@ -110,25 +77,25 @@ class DelegatingCalculator
 
         foreach ($movesAttackingKing as $m) {
             return CheckState::CHECK; // stop here until checkmate logic is fixed
-            $movesByKing = $this->calculateWithSource($squaresWithOppositeKing[0], $game)->all();
-
-            if (0 == sizeof($movesByKing)) {
-                // king has nowhere to go, checkmate
-                return CheckState::CHECKMATE;
-            }
-
-            foreach ($movesByKing as $moveByKing) {
-                $g = clone $clone;
-                $g->move($moveByKing);
-                $newKingDestination = $moveByKing->to[0];
-                $movesStillAttackingKing = $this->calculateWithDestination($newKingDestination, $g)->all();
-
-                if (sizeof($movesStillAttackingKing) > 0) {
-                    return CheckState::CHECKMATE;
-                }
-            }
-
-            return CheckState::CHECK;
+            //            $movesByKing = $this->calculate($game)->from($squaresWithOppositeKing[0])->all();
+            //
+            //            if (0 == sizeof($movesByKing)) {
+            //                // king has nowhere to go, checkmate
+            //                return CheckState::CHECKMATE;
+            //            }
+            //
+            //            foreach ($movesByKing as $moveByKing) {
+            //                $g = clone $clone;
+            //                $g->move($moveByKing);
+            //                $newKingDestination = $moveByKing->to[0];
+            //                $movesStillAttackingKing = $this->calculateWithDestination($newKingDestination, $g)->all();
+            //
+            //                if (sizeof($movesStillAttackingKing) > 0) {
+            //                    return CheckState::CHECKMATE;
+            //                }
+            //            }
+            //
+            //            return CheckState::CHECK;
         }
 
         return CheckState::NONE;
@@ -136,7 +103,7 @@ class DelegatingCalculator
 
     public function calculcateMultiplePiecesWithDestination(string $pieceClass, Position $destination, Game $game): bool
     {
-        $moves = $this->calculateWithDestination($destination, $game)->all();
+        $moves = $this->calculate($game)->to($destination)->all();
         $eligible = [];
 
         foreach ($moves as $m) {
