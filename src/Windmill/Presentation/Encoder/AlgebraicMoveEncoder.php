@@ -7,7 +7,6 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
 use App\Windmill\Move;
-use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
@@ -94,15 +93,6 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
             CheckState::CHECKMATE => '#',
             default => '',
         };
-    }
-
-    public function encodePiece(AbstractPiece $movingPiece, SimpleMove $move): string
-    {
-        if (Pawn::class != $movingPiece::class) {
-            return $this->pieceEncoder->encode($movingPiece, $move->from[0]);
-        }
-
-        return '';
     }
 
     private function encodeMovingPieceChar(Position $from, Position $captureablePiecePosition, Board $board): string

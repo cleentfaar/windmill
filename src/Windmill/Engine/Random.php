@@ -7,7 +7,7 @@ use App\Windmill\Game;
 
 class Random implements RecommendationEngineInterface
 {
-    public function __construct(private readonly DelegatingCalculator $calculator)
+    public function __construct(private readonly DelegatingCalculator $calculator = new DelegatingCalculator())
     {
     }
 

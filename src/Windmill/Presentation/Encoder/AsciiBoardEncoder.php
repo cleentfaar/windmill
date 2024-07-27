@@ -12,7 +12,6 @@ use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Queen;
 use App\Windmill\Piece\Rook;
 use App\Windmill\Position;
-use Symfony\Component\Uid\Uuid;
 
 class AsciiBoardEncoder implements BoardEncoderInterface
 {
@@ -67,12 +66,7 @@ class AsciiBoardEncoder implements BoardEncoderInterface
         return $output;
     }
 
-    public function decode(string $encodedBoard, ?Uuid $boardId = null): Board
-    {
-        // TODO: Implement decode() method.
-    }
-
-    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece)
+    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece): string
     {
         return $this->getPieceSymbol($piece);
     }

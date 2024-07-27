@@ -8,12 +8,12 @@ use App\Windmill\Position;
 
 class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
 {
-    private const BLACK_SQUARE_BG = '#964B00';
-    private const WHITE_SQUARE_BG = '#DAA06D';
-    private const WHITE_PIECE_FG = '#EADDCA';
-    private const BLACK_PIECE_FG = '#5C4033';
+    private const string BLACK_SQUARE_BG = '#964B00';
+    private const string WHITE_SQUARE_BG = '#DAA06D';
+    private const string WHITE_PIECE_FG = '#EADDCA';
+    private const string BLACK_PIECE_FG = '#5C4033';
 
-    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece)
+    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece): string
     {
         $bg = $this->getBackgroundColor($position);
         $fg = $this->getForegroundColor($piece);

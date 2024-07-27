@@ -62,7 +62,7 @@ class DelegatingCalculator
         $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
 
         if (1 != sizeof($squaresWithOppositeKing)) {
-            throw new \Exception(sprintf('Expected a single square to be occupied by the king, got %d', sizeof($squaresWithOppositeKing)));
+            return CheckState::NONE;
         }
 
         $moveCollection = $this->calculate($clone);
