@@ -13,10 +13,11 @@ class AsciiBoardEncoderTest extends AbstractTestCase
      */
     public function testEndToEndGames(
         string $FEN,
+        string $spacingCharacter,
         string $expectedOutput
     ): void {
         $game = self::createGameFromFEN($FEN);
-        $encoder = new AsciiBoardEncoder(false);
+        $encoder = new AsciiBoardEncoder(true, true, $spacingCharacter);
         $actualOutput = $encoder->encode($game->board);
 
         $this->assertEquals($expectedOutput, $actualOutput);
@@ -27,16 +28,32 @@ class AsciiBoardEncoderTest extends AbstractTestCase
         return [
             [
                 FENGameEncoder::STANDARD_FEN,
+                ' ',
                 '
-8  ♜  ♞  ♝  ♛  ♚  ♝  ♞  ♜ 
-7  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎ 
+8  ♖  ♘  ♗  ♕  ♔  ♗  ♘  ♖ 
+7  ♙  ♙  ♙  ♙  ♙  ♙  ♙  ♙ 
 6                         
 5                         
 4                         
 3                         
-2  ♙  ♙  ♙  ♙  ♙  ♙  ♙  ♙ 
-1  ♖  ♘  ♗  ♕  ♔  ♗  ♘  ♖ 
+2  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎ 
+1  ♜  ♞  ♝  ♛  ♚  ♝  ♞  ♜ 
    A  B  C  D  E  F  G  H 
+',
+            ],
+            [
+                FENGameEncoder::STANDARD_FEN,
+                ' ',
+                '
+8  ♖  ♘  ♗  ♕  ♔  ♗  ♘  ♖ 
+7  ♙  ♙  ♙  ♙  ♙  ♙  ♙  ♙ 
+6                         
+5                         
+4                         
+3                         
+2  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎  ♟︎ 
+1  ♜  ♞  ♝  ♛  ♚  ♝  ♞  ♜ 
+   A  B  C  D  E  F  G  H 
 ',
             ],
         ];
