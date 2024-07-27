@@ -10,7 +10,7 @@ class FENGameEncoderTest extends AbstractTestCase
 	/**
 	 * @dataProvider gameProvider
 	 */
-	public function testItEncodesToExpectedOutput(
+	public function testItDecodesAndEncodesToTheSameGame(
 		string $expectedFEN
 	): void {
 		$game = self::createGameFromFEN($expectedFEN);

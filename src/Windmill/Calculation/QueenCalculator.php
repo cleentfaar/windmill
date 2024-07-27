@@ -2,7 +2,6 @@
 
 namespace App\Windmill\Calculation;
 
-use App\Windmill\Board;
 use App\Windmill\BoardWalker;
 use App\Windmill\Color;
 use App\Windmill\Game;
@@ -17,144 +16,37 @@ class QueenCalculator extends AbstractPieceCalculator
 		Game $game,
 		Position $currentPosition,
 		Color $currentColor,
-		MoveCollection &$moveCollection
+		MoveCollection $moves
 	): void {
 		$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
 
-		$this->calculateRegularMoves(
-			$walker,
-			$moveCollection,
-			$currentColor,
-			$game->board
-		);
-	}
+		$movements = [
+			function (BoardWalker $walker) { return $walker->left(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->forwardLeft(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->forward(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->forwardRight(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->right(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->backwardRight(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->backward(1, true)->current(); },
+			function (BoardWalker $walker) { return $walker->backwardLeft(1, true)->current(); },
+		];
 
-	private function calculateRegularMoves(BoardWalker $walker, MoveCollection $moves, Color $currentColor, Board $board)
-	{
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->left(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
+		foreach ($movements as $movement) {
+			for ($x = 0; $x < 8; ++$x) {
+				if ($current = $movement($walker)) {
+					if ($piece = $game->board->pieceOn($current)) {
+						if ($piece->color != $currentColor) {
+							$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
+						}
+
+						break;
 					}
 
-					break;
+					$moves->add(new SimpleMove($walker->startingPosition, $current));
 				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
 			}
-		}
 
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->forwardLeft(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->forward(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->forwardRight(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->right(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->backwardRight(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->backward(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
-		}
-
-		$walker->reset();
-
-		for ($x = 0; $x < 8; ++$x) {
-			if ($current = $walker->backwardLeft(1, true)->current()) {
-				if ($piece = $board->pieceOn($current)) {
-					if ($piece->color != $currentColor) {
-						$moves->add(new MultiMove([$walker->startingPosition, $current], [$current, null]));
-					}
-
-					break;
-				}
-
-				$moves->add(new SimpleMove($walker->startingPosition, $current));
-			}
+			$walker->reset();
 		}
 	}
 }

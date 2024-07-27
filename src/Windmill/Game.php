@@ -29,12 +29,15 @@ class Game
 	) {
 	}
 
-	public function move(AbstractMove $move)
+	public function move(AbstractMove $move, bool $virtual = false)
 	{
 		$this->updateStatesBeforeExecutingMove($move);
 		$this->board->move($move);
-		$this->colorToMove = Color::WHITE == $this->colorToMove ? Color::BLACK : Color::WHITE;
-		$this->lastMove = $move;
+
+		if (!$virtual) {
+			$this->colorToMove = Color::WHITE == $this->colorToMove ? Color::BLACK : Color::WHITE;
+			$this->lastMove = $move;
+		}
 	}
 
 	public function isFinished(): bool

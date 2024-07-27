@@ -16,7 +16,7 @@ class KnightCalculator extends AbstractPieceCalculator
 		Game $game,
 		Position $currentPosition,
 		Color $currentColor,
-		MoveCollection &$moveCollection
+		MoveCollection $moves
 	): void {
 		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, true, false);
 		$lShapes = [
@@ -35,9 +35,9 @@ class KnightCalculator extends AbstractPieceCalculator
 				$targetPiece = $game->board->pieceOn($pos);
 
 				if (!$targetPiece) {
-					$moveCollection->add(new SimpleMove($currentPosition, $pos));
+					$moves->add(new SimpleMove($currentPosition, $pos));
 				} elseif ($targetPiece->color != $currentColor) {
-					$moveCollection->add(new MultiMove(
+					$moves->add(new MultiMove(
 						[$currentPosition, $pos],
 						[$pos, null]
 					));

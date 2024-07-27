@@ -103,6 +103,19 @@ class Board
 		return $this->squares[$position->value] ?? null;
 	}
 
+	public function squaresWithPiece(string $class, Color $color): array
+	{
+		$positions = [];
+
+		foreach ($this->squares() as $square => $piece) {
+			if ($piece && $piece::class == $class && $piece->color == $color) {
+				$positions[] = Position::tryFrom($square);
+			}
+		}
+
+		return $positions;
+	}
+
 	public function move(AbstractMove $move): void
 	{
 		switch ($move::class) {

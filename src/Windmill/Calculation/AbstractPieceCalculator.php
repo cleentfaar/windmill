@@ -13,7 +13,7 @@ abstract class AbstractPieceCalculator
 		Game $game,
 		Position $currentPosition,
 		Color $currentColor,
-		MoveCollection &$moveCollection
+		MoveCollection $moves
 	): void;
 
 	public function distanceToBaseline(Position $position, Color $color): int

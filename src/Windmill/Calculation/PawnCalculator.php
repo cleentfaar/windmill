@@ -16,10 +16,11 @@ class PawnCalculator extends AbstractPieceCalculator
 		Game $game,
 		Position $currentPosition,
 		Color $currentColor,
-		MoveCollection &$moveCollection
+		MoveCollection $moves
 	): void {
-		$this->calculateSimpleMoves($game, $moveCollection, $currentPosition, $currentColor);
-		$this->calculcateCaptures($game, $moveCollection, $currentPosition, $currentColor);
+		$this->calculateSimpleMoves($game, $moves, $currentPosition, $currentColor);
+		$this->calculcateCaptures($game, $moves, $currentPosition, $currentColor);
+		$this->calculcateEnPassant($game, $moves, $currentPosition, $currentColor);
 	}
 
 	private function calculateSimpleMoves(
@@ -54,7 +55,7 @@ class PawnCalculator extends AbstractPieceCalculator
 		Position $currentPosition,
 		Color $currentColor,
 	): void {
-		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, false, true);
+		$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
 		$forwardLeft = $walker->forwardLeft(1, true)->current();
 		if ($forwardLeft) {
 			$opponentPiece = $game->board->pieceOn($forwardLeft);
@@ -77,5 +78,32 @@ class PawnCalculator extends AbstractPieceCalculator
 		}
 
 		$walker->reset();
+	}
+
+	private function calculcateEnPassant(
+		Game $game,
+		MoveCollection $moveCollection,
+		Position $currentPosition,
+		Color $currentColor
+	): void {
+		if (!$enPassantTarget = $game->enPassantTargetSquare()) {
+			return;
+		}
+
+		$enPassantCaptures = [
+			function ($walker) { return $walker->forwardLeft()->current(); },
+			function ($walker) { return $walker->forwardRight()->current(); },
+		];
+
+		foreach ($enPassantCaptures as $enPassantCapture) {
+			$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
+			$destination = $enPassantCapture($walker);
+
+			if ($destination == $enPassantTarget) {
+				$enPassantWalker = new BoardWalker($enPassantTarget, Color::oppositeOf($currentColor), $game->board);
+				$positionOfPieceToCapture = $enPassantWalker->forward(1, false, true)->current();
+				$moveCollection->add(new MultiMove([$currentPosition, $enPassantTarget], [$positionOfPieceToCapture, null]));
+			}
+		}
 	}
 }

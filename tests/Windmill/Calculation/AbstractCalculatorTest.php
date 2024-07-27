@@ -21,19 +21,21 @@ abstract class AbstractCalculatorTest extends AbstractTestCase
 	) {
 		$game = self::createGameFromFEN($fen);
 		$calculator = $this->createCalculator();
-		$moves = new MoveCollection();
-		$pos = $currentPosition ?: self::findPieceOnBoard($this->createPiece($game->currentColor())::class, $game->currentColor(), $game->board);
+		$actualMoveCollection = new MoveCollection();
+		$pos = $currentPosition ? [$currentPosition] : self::findPiecesOnBoard($this->createPiece($game->currentColor())::class, $game->currentColor(), $game->board);
 
-		$calculator->calculate(
-			$game,
-			$pos,
-			$game->currentColor(),
-			$moves
-		);
+		foreach ($pos as $p) {
+			$calculator->calculate(
+				$game,
+				$p,
+				$game->currentColor(),
+				$actualMoveCollection
+			);
+		}
 
 		$this->assertEqualMoves(
 			$expectedMoves,
-			self::encodeMovesToSANs($moves, $game),
+			self::encodeMovesToSANs($actualMoveCollection, $game),
 			$game
 		);
 	}

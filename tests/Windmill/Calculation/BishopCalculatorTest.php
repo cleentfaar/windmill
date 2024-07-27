@@ -3,13 +3,13 @@
 namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
-use App\Windmill\Calculation\KingCalculator;
+use App\Windmill\Calculation\BishopCalculator;
 use App\Windmill\Color;
 use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\King;
+use App\Windmill\Piece\Bishop;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
-class KingCalculatorTest extends AbstractCalculatorTest
+class BishopCalculatorTest extends AbstractCalculatorTest
 {
 	protected function fenAndExpectedMovesProvider(): array
 	{
@@ -18,24 +18,24 @@ class KingCalculatorTest extends AbstractCalculatorTest
 				FENGameEncoder::STANDARD_FEN,
 				[],
 			],
-			'castling kingside' => [
-				'4k3/pppppppp/8/8/8/8/8/4K2R w KQ d4 0 1',
-				['Ke2', 'Kd1', 'Kf1', 'Kd2', 'Kf2', '0-0'],
+			'move multiple squares diagonally' => [
+				'4k3/8/8/8/8/8/4B3/4K2R w KQ d4 0 1',
+				['Bd3', 'Bc4', 'Bb5', 'Ba6', 'Bf3', 'Bg4', 'Bh5', 'Bf1', 'Bd1'],
 			],
-			'castling queenside' => [
-				'4k3/pppppppp/8/8/8/8/8/R3K3 w KQ d4 0 1',
-				['Ke2', 'Kd1', 'Kf1', 'Kd2', 'Kf2', '0-0-0'],
+			'capture across multiple squares diagonally' => [
+				'4k3/8/8/pppppppp/8/8/4B3/4K2R w KQ d4 0 1',
+				['Bd3', 'Bc4', 'Bxb5', 'Bf3', 'Bg4', 'Bxh5', 'Bf1', 'Bd1'],
 			],
 		];
 	}
 
 	protected function createCalculator(): AbstractPieceCalculator
 	{
-		return new KingCalculator();
+		return new BishopCalculator();
 	}
 
 	protected function createPiece(Color $color): AbstractPiece
 	{
-		return new King($color);
+		return new Bishop($color);
 	}
 }

@@ -13,6 +13,7 @@ use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Queen;
+use DeepCopy\DeepCopy;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
@@ -48,12 +49,16 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 					$game
 				);
 
+				$checksOrCheckmates = '';
+				//				$checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
+
 				return sprintf(
-					'%s%s%s%s',
+					'%s%s%s%s%s',
 					$firstChar,
 					$uniqueFile,
 					$to->fileLetter(),
-					$to->rank()
+					$to->rank(),
+					$checksOrCheckmates
 				);
 			case MultiMove::class:
 				$movingPiece = $game->board->pieceOn($move->from[0]);
@@ -69,30 +74,24 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 					}
 				}
 
-				$isCapture = $move->capturesPiecesOfColor(
-					$game->board,
-					Color::oppositeOf($game->currentColor())
-				);
-
-				if (!$isCapture) {
-					throw new \Exception('Encoder only supports regular capture multi-moves for now');
-				}
-
 				if (Pawn::class == $movingPiece::class) {
 					$firstChar = $move->from[0]->fileLetter();
 				} else {
 					$firstChar = $this->pieceEncoder->encode($game->board->pieceOn($move->from[0]), $move->from[0]);
 				}
 
-				$moves = $this->calculator->calculateWithDestination($move->to[0], $game);
+				$moves = $this->calculator->calculateWithDestination($move->from[0], $game);
 				$uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $moves, $game);
+				$checksOrCheckmates = '';
+				//				$checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($movingPiece, $move, $game);
 
 				return sprintf(
-					'%s%sx%s%d',
+					'%s%sx%s%d%s',
 					$firstChar,
 					$uniqueFile,
-					$move->to[0]->fileLetter(),
-					$move->to[0]->rank()
+					$move->from[1]->fileLetter(),
+					$move->from[1]->rank(),
+					$checksOrCheckmates
 				);
 			default:
 				throw new \Exception(sprintf("Moves of type '%s' can not be encoded", $move::class));
@@ -122,36 +121,42 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 	private function encodeUniqueFile(AbstractPiece $movingPiece, AbstractMove $move, MoveCollection $moves, Game $game): string
 	{
 		$uniqueFile = '';
-
-		if (SimpleMove::class == $move::class) {
-			$moveFrom = $move->from;
-		} else {
-			$moveFrom = $move->from[0];
-		}
-
+		$moveFrom = SimpleMove::class == $move::class ? $move->from : $move->from[0];
 		$moves = $moves->all();
 
 		if (sizeof($moves) > 1 && !in_array($movingPiece::class, [Queen::class, King::class])) {
 			foreach ($moves as $m) {
-				switch ($m::class) {
-					case SimpleMove::class:
-						if ($game->board->pieceOn($m->from)::class == $movingPiece::class && $m->from !== $moveFrom) {
-							$uniqueFile .= $moveFrom->fileLetter();
-							break 2;
-						}
-
-						break;
-					case MultiMove::class:
-						if ($game->board->pieceOn($m->from[0])::class == $movingPiece::class && $m->from[0] !== $moveFrom) {
-							$uniqueFile .= $moveFrom->fileLetter();
-							break 2;
-						}
-
-						break;
+				$mFrom = SimpleMove::class == $m::class ? $m->from : $m->from[0];
+				if ($game->board->pieceOn($mFrom)::class == $movingPiece::class && $mFrom !== $moveFrom) {
+					$uniqueFile .= $moveFrom->fileLetter();
+					break;
 				}
 			}
 		}
 
 		return $uniqueFile;
+	}
+
+	private function encodeChecksOrCheckmatesOpponent(AbstractPiece $movingPiece, AbstractMove $move, Game $game): string
+	{
+		/* @var Game $clone */
+		$clone = (new DeepCopy())->copy($game);
+		$clone->move($move, true);
+		$squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
+
+		if (1 != sizeof($squaresWithOppositeKing)) {
+			throw new \Exception(sprintf('Expected a single square to be occupied, got %d', sizeof($squaresWithOppositeKing)));
+		}
+
+		$moveCollection = $this->calculator->calculateWithDestination($squaresWithOppositeKing[0], $clone);
+		$moveTo = SimpleMove::class == $move::class ? $move->to : $move->to[0];
+
+		foreach ($moveCollection->all() as $m) {
+			if ($m->from[0] == $moveTo && $clone->board->pieceOn($m->from[0])::class == $movingPiece::class) {
+				return '+';
+			}
+		}
+
+		return '';
 	}
 }

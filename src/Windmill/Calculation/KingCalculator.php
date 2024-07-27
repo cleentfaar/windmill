@@ -17,12 +17,12 @@ class KingCalculator extends AbstractPieceCalculator
 		Game $game,
 		Position $currentPosition,
 		Color $currentColor,
-		MoveCollection &$moveCollection
+		MoveCollection $moves
 	): void {
 		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
 
-		$this->calculcateRegularMoves($game, $walker, $moveCollection);
-		$this->calculcateCastlingMoves($game, $walker, $moveCollection);
+		$this->calculcateRegularMoves($game, $walker, $moves);
+		$this->calculcateCastlingMoves($game, $walker, $moves);
 	}
 
 	private function calculcateCastlingMoves(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
@@ -87,6 +87,8 @@ class KingCalculator extends AbstractPieceCalculator
 		if ($position = $walker->backwardRight()->current()) {
 			$moveCollection->add(new SimpleMove($walker->startingPosition, $position));
 		}
+
+		$walker->reset();
 	}
 
 	private function calculateQueensideCastlingMove(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
@@ -98,6 +100,11 @@ class KingCalculator extends AbstractPieceCalculator
 		}
 
 		$rookPosition = $walker->absoluteLeft(1, false, true)->current();
+
+		if (!$rookPosition) {
+			return;
+		}
+
 		$rook = $game->board->pieceOn($rookPosition);
 
 		if (!$rook || $rook->color != $game->currentColor() || Rook::class !== $rook::class) {
@@ -108,6 +115,8 @@ class KingCalculator extends AbstractPieceCalculator
 			[$walker->startingPosition, $walker->absoluteRight()->current()],
 			[$rookPosition, $walker->absoluteLeft()->current()]
 		));
+
+		$walker->reset();
 	}
 
 	private function calculateKingsideCastlingMove(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
