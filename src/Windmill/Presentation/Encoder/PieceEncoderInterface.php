@@ -8,7 +8,7 @@ use App\Windmill\Position;
 
 interface PieceEncoderInterface
 {
-	public function encode(AbstractPiece $decodedPiece, Position $position): string;
+    public function encode(AbstractPiece $decodedPiece, Position $position): string;
 
-	public function decode(string $encodedPiece, Color $color): AbstractPiece;
+    public function decode(string $encodedPiece, Color $color): AbstractPiece;
 }

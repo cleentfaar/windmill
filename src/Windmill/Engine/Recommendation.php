@@ -6,7 +6,7 @@ use App\Windmill\Move\AbstractMove;
 
 class Recommendation
 {
-	public function __construct(public readonly AbstractMove $move, public readonly int $confidence = 100)
-	{
-	}
+    public function __construct(public readonly AbstractMove $move, public readonly int $confidence = 100)
+    {
+    }
 }

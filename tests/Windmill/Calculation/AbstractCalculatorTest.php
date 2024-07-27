@@ -11,38 +11,38 @@ use App\Windmill\Position;
 
 abstract class AbstractCalculatorTest extends AbstractTestCase
 {
-	/**
-	 * @dataProvider fenAndExpectedMovesProvider
-	 */
-	public function testItCalculatesExpectedMoves(
-		string $fen,
-		array $expectedMoves,
-		?Position $currentPosition = null,
-	) {
-		$game = self::createGameFromFEN($fen);
-		$calculator = $this->createCalculator();
-		$actualMoveCollection = new MoveCollection();
-		$pos = $currentPosition ? [$currentPosition] : self::findPiecesOnBoard($this->createPiece($game->currentColor())::class, $game->currentColor(), $game->board);
+    /**
+     * @dataProvider fenAndExpectedMovesProvider
+     */
+    public function testItCalculatesExpectedMoves(
+        string $fen,
+        array $expectedMoves,
+        ?Position $currentPosition = null,
+    ) {
+        $game = self::createGameFromFEN($fen);
+        $calculator = $this->createCalculator();
+        $actualMoveCollection = new MoveCollection();
+        $pos = $currentPosition ? [$currentPosition] : self::findPiecesOnBoard($this->createPiece($game->currentColor())::class, $game->currentColor(), $game->board);
 
-		foreach ($pos as $p) {
-			$calculator->calculate(
-				$game,
-				$p,
-				$game->currentColor(),
-				$actualMoveCollection
-			);
-		}
+        foreach ($pos as $p) {
+            $calculator->calculate(
+                $game,
+                $p,
+                $game->currentColor(),
+                $actualMoveCollection
+            );
+        }
 
-		$this->assertEqualMoves(
-			$expectedMoves,
-			self::encodeMovesToSANs($actualMoveCollection, $game),
-			$game
-		);
-	}
+        $this->assertEqualMoves(
+            $expectedMoves,
+            self::encodeMovesToSANs($actualMoveCollection, $game),
+            $game
+        );
+    }
 
-	abstract protected function fenAndExpectedMovesProvider(): array;
+    abstract protected function fenAndExpectedMovesProvider(): array;
 
-	abstract protected function createCalculator(): AbstractPieceCalculator;
+    abstract protected function createCalculator(): AbstractPieceCalculator;
 
-	abstract protected function createPiece(Color $color): AbstractPiece;
+    abstract protected function createPiece(Color $color): AbstractPiece;
 }

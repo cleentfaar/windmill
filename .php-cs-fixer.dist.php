@@ -10,7 +10,5 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
     ])
     ->setFinder($finder)
-    ->setIndent("\t")
-    ->setLineEnding("\r\n")
     ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
 ;

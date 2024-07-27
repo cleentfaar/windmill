@@ -7,9 +7,9 @@ use App\Windmill\Move\MoveCollection;
 
 class Replay
 {
-	public function __construct(
-		public readonly Game $game,
-		public readonly MoveCollection $moves,
-	) {
-	}
+    public function __construct(
+        public readonly Game $game,
+        public readonly MoveCollection $moves,
+    ) {
+    }
 }

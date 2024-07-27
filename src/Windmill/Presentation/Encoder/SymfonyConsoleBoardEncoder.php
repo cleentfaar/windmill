@@ -8,35 +8,35 @@ use App\Windmill\Position;
 
 class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
 {
-	private const BLACK_SQUARE_BG = '#964B00';
-	private const WHITE_SQUARE_BG = '#DAA06D';
-	private const WHITE_PIECE_FG = '#EADDCA';
-	private const BLACK_PIECE_FG = '#5C4033';
+    private const BLACK_SQUARE_BG = '#964B00';
+    private const WHITE_SQUARE_BG = '#DAA06D';
+    private const WHITE_PIECE_FG = '#EADDCA';
+    private const BLACK_PIECE_FG = '#5C4033';
 
-	protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece)
-	{
-		$bg = $this->getBackgroundColor($position);
-		$fg = $this->getForegroundColor($piece);
-		$pieceSymbol = parent::renderPieceSymbol($position, $piece);
+    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece)
+    {
+        $bg = $this->getBackgroundColor($position);
+        $fg = $this->getForegroundColor($piece);
+        $pieceSymbol = parent::renderPieceSymbol($position, $piece);
 
-		return sprintf('<fg=%s;bg=%s>%s</>', $fg, $bg, $pieceSymbol);
-	}
+        return sprintf('<fg=%s;bg=%s>%s</>', $fg, $bg, $pieceSymbol);
+    }
 
-	private function getBackgroundColor(Position $position): string
-	{
-		if ($position->rank() % 2 == $position->file() % 2) {
-			return self::BLACK_SQUARE_BG;
-		}
+    private function getBackgroundColor(Position $position): string
+    {
+        if ($position->rank() % 2 == $position->file() % 2) {
+            return self::BLACK_SQUARE_BG;
+        }
 
-		return self::WHITE_SQUARE_BG;
-	}
+        return self::WHITE_SQUARE_BG;
+    }
 
-	private function getForegroundColor(?AbstractPiece $piece): string
-	{
-		if ($piece && Color::WHITE == $piece->color) {
-			return self::WHITE_PIECE_FG;
-		}
+    private function getForegroundColor(?AbstractPiece $piece): string
+    {
+        if ($piece && Color::WHITE == $piece->color) {
+            return self::WHITE_PIECE_FG;
+        }
 
-		return self::BLACK_PIECE_FG;
-	}
+        return self::BLACK_PIECE_FG;
+    }
 }

@@ -12,98 +12,98 @@ use App\Windmill\Position;
 
 class PawnCalculator extends AbstractPieceCalculator
 {
-	public function calculate(
-		Game $game,
-		Position $currentPosition,
-		Color $currentColor,
-		MoveCollection $moves
-	): void {
-		$this->calculateSimpleMoves($game, $moves, $currentPosition, $currentColor);
-		$this->calculcateCaptures($game, $moves, $currentPosition, $currentColor);
-		$this->calculcateEnPassant($game, $moves, $currentPosition, $currentColor);
-	}
+    public function calculate(
+        Game $game,
+        Position $currentPosition,
+        Color $currentColor,
+        MoveCollection $moves
+    ): void {
+        $this->calculateSimpleMoves($game, $moves, $currentPosition, $currentColor);
+        $this->calculcateCaptures($game, $moves, $currentPosition, $currentColor);
+        $this->calculcateEnPassant($game, $moves, $currentPosition, $currentColor);
+    }
 
-	private function calculateSimpleMoves(
-		Game $game,
-		MoveCollection $moveCollection,
-		Position $currentPosition,
-		Color $currentColor
-	): void {
-		$walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
-		$to = $walker->forward(1)->current();
+    private function calculateSimpleMoves(
+        Game $game,
+        MoveCollection $moveCollection,
+        Position $currentPosition,
+        Color $currentColor
+    ): void {
+        $walker = new BoardWalker($currentPosition, $currentColor, $game->board, true);
+        $to = $walker->forward(1)->current();
 
-		if ($to && !$game->board->pieceOn($to)) {
-			$moveCollection->add(new SimpleMove($currentPosition, $to));
-		}
+        if ($to && !$game->board->pieceOn($to)) {
+            $moveCollection->add(new SimpleMove($currentPosition, $to));
+        }
 
-		$walker->reset();
+        $walker->reset();
 
-		if (2 == $this->distanceToBaseline($currentPosition, $currentColor)) {
-			// allow double forward
-			$to = $walker->forward(2)->current();
+        if (2 == $this->distanceToBaseline($currentPosition, $currentColor)) {
+            // allow double forward
+            $to = $walker->forward(2)->current();
 
-			if ($to && !$game->board->pieceOn($to)) {
-				$m = new SimpleMove($currentPosition, $to);
-				$moveCollection->add($m);
-			}
-		}
-	}
+            if ($to && !$game->board->pieceOn($to)) {
+                $m = new SimpleMove($currentPosition, $to);
+                $moveCollection->add($m);
+            }
+        }
+    }
 
-	private function calculcateCaptures(
-		Game $game,
-		MoveCollection $moveCollection,
-		Position $currentPosition,
-		Color $currentColor,
-	): void {
-		$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
-		$forwardLeft = $walker->forwardLeft(1, true)->current();
-		if ($forwardLeft) {
-			$opponentPiece = $game->board->pieceOn($forwardLeft);
+    private function calculcateCaptures(
+        Game $game,
+        MoveCollection $moveCollection,
+        Position $currentPosition,
+        Color $currentColor,
+    ): void {
+        $walker = new BoardWalker($currentPosition, $currentColor, $game->board);
+        $forwardLeft = $walker->forwardLeft(1, true)->current();
+        if ($forwardLeft) {
+            $opponentPiece = $game->board->pieceOn($forwardLeft);
 
-			if ($opponentPiece && $opponentPiece->color !== $currentColor) {
-				$moveCollection->add(new MultiMove([$currentPosition, $forwardLeft], [$forwardLeft, null]));
-			}
-		}
+            if ($opponentPiece && $opponentPiece->color !== $currentColor) {
+                $moveCollection->add(new MultiMove([$currentPosition, $forwardLeft], [$forwardLeft, null]));
+            }
+        }
 
-		$walker->reset();
+        $walker->reset();
 
-		$forwardRight = $walker->forwardRight(1, true)->current();
+        $forwardRight = $walker->forwardRight(1, true)->current();
 
-		if ($forwardRight) {
-			$opponentPiece = $game->board->pieceOn($forwardRight);
+        if ($forwardRight) {
+            $opponentPiece = $game->board->pieceOn($forwardRight);
 
-			if ($opponentPiece && $opponentPiece->color !== $currentColor) {
-				$moveCollection->add(new MultiMove([$currentPosition, $forwardRight], [$forwardRight, null]));
-			}
-		}
+            if ($opponentPiece && $opponentPiece->color !== $currentColor) {
+                $moveCollection->add(new MultiMove([$currentPosition, $forwardRight], [$forwardRight, null]));
+            }
+        }
 
-		$walker->reset();
-	}
+        $walker->reset();
+    }
 
-	private function calculcateEnPassant(
-		Game $game,
-		MoveCollection $moveCollection,
-		Position $currentPosition,
-		Color $currentColor
-	): void {
-		if (!$enPassantTarget = $game->enPassantTargetSquare()) {
-			return;
-		}
+    private function calculcateEnPassant(
+        Game $game,
+        MoveCollection $moveCollection,
+        Position $currentPosition,
+        Color $currentColor
+    ): void {
+        if (!$enPassantTarget = $game->enPassantTargetSquare()) {
+            return;
+        }
 
-		$enPassantCaptures = [
-			function ($walker) { return $walker->forwardLeft()->current(); },
-			function ($walker) { return $walker->forwardRight()->current(); },
-		];
+        $enPassantCaptures = [
+            function ($walker) { return $walker->forwardLeft()->current(); },
+            function ($walker) { return $walker->forwardRight()->current(); },
+        ];
 
-		foreach ($enPassantCaptures as $enPassantCapture) {
-			$walker = new BoardWalker($currentPosition, $currentColor, $game->board);
-			$destination = $enPassantCapture($walker);
+        foreach ($enPassantCaptures as $enPassantCapture) {
+            $walker = new BoardWalker($currentPosition, $currentColor, $game->board);
+            $destination = $enPassantCapture($walker);
 
-			if ($destination == $enPassantTarget) {
-				$enPassantWalker = new BoardWalker($enPassantTarget, Color::oppositeOf($currentColor), $game->board);
-				$positionOfPieceToCapture = $enPassantWalker->forward(1, false, true)->current();
-				$moveCollection->add(new MultiMove([$currentPosition, $enPassantTarget], [$positionOfPieceToCapture, null]));
-			}
-		}
-	}
+            if ($destination == $enPassantTarget) {
+                $enPassantWalker = new BoardWalker($enPassantTarget, Color::oppositeOf($currentColor), $game->board);
+                $positionOfPieceToCapture = $enPassantWalker->forward(1, false, true)->current();
+                $moveCollection->add(new MultiMove([$currentPosition, $enPassantTarget], [$positionOfPieceToCapture, null]));
+            }
+        }
+    }
 }

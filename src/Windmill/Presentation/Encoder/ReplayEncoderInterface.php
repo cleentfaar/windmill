@@ -6,7 +6,7 @@ use App\Windmill\Presentation\Replay;
 
 interface ReplayEncoderInterface
 {
-	public function encode(Replay $game): string;
+    public function encode(Replay $game): string;
 
-	public function decode(string $game): Replay;
+    public function decode(string $game): Replay;
 }

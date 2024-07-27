@@ -6,9 +6,9 @@ use App\Windmill\Move\MoveCollection;
 
 class PieceHistory
 {
-	public function __construct(
-		public readonly MoveCollection $moves = new MoveCollection(),
-		public readonly bool $hasAmbigiousMoves = false
-	) {
-	}
+    public function __construct(
+        public readonly MoveCollection $moves = new MoveCollection(),
+        public readonly bool $hasAmbigiousMoves = false
+    ) {
+    }
 }

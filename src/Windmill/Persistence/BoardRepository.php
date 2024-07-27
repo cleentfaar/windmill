@@ -7,7 +7,7 @@ use Symfony\Component\Uid\Uuid;
 
 interface BoardRepository
 {
-	public function find(Uuid $id): ?Board;
+    public function find(Uuid $id): ?Board;
 
-	public function save(Board $game): void;
+    public function save(Board $game): void;
 }

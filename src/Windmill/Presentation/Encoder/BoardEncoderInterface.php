@@ -7,7 +7,7 @@ use Symfony\Component\Uid\Uuid;
 
 interface BoardEncoderInterface
 {
-	public function encode(Board $board): string;
+    public function encode(Board $board): string;
 
-	public function decode(string $encodedBoard, ?Uuid $boardId = null): Board;
+    public function decode(string $encodedBoard, ?Uuid $boardId = null): Board;
 }
