@@ -16,7 +16,7 @@ use Symfony\Component\Uid\Uuid;
 
 class AsciiBoardEncoder implements BoardEncoderInterface
 {
-    private const PIECE_SYMBOLS = [
+    private const array PIECE_SYMBOLS = [
         Color::WHITE->value => [
             Pawn::class => '♙',
             Bishop::class => '♗',
@@ -35,8 +35,11 @@ class AsciiBoardEncoder implements BoardEncoderInterface
         ],
     ];
 
-    public function __construct(private readonly bool $solidWhite = true, private readonly bool $hollowBlack = false)
-    {
+    public function __construct(
+        private readonly bool $solidWhite = true,
+        private readonly bool $hollowBlack = false,
+        private readonly string $spacingCharacter = ' '
+    ) {
     }
 
     public function encode(Board $board): string
@@ -44,7 +47,7 @@ class AsciiBoardEncoder implements BoardEncoderInterface
         $output = "\n";
 
         for ($rank = 8; $rank >= 1; --$rank) {
-            $output .= $rank.' ';
+            $output .= sprintf('%d ', $rank);
             for ($file = 1; $file <= 8; ++$file) {
                 $position = Position::tryFrom($file.$rank);
                 $piece = $board->pieceOn($position);
@@ -53,7 +56,12 @@ class AsciiBoardEncoder implements BoardEncoderInterface
             $output .= "\n";
         }
 
-        $output .= "   A  B  C  D  E  F  G  H \n";
+        $output .= sprintf(
+            "  %s%s%s\n",
+            $this->spacingCharacter,
+            implode(str_repeat($this->spacingCharacter, 2), range('A', 'H')),
+            $this->spacingCharacter
+        );
 
         return $output;
     }
@@ -79,12 +87,13 @@ class AsciiBoardEncoder implements BoardEncoderInterface
                 $color = $piece->color;
             }
 
-            return sprintf(
-                ' %s ',
-                self::PIECE_SYMBOLS[$color->value][$piece::class]
-            );
+            return join('', [
+                $this->spacingCharacter,
+                self::PIECE_SYMBOLS[$color->value][$piece::class],
+                $this->spacingCharacter,
+            ]);
         }
 
-        return '   ';
+        return sprintf('%s %s', $this->spacingCharacter, $this->spacingCharacter);
     }
 }
