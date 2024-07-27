@@ -68,9 +68,9 @@ class Game
         $halfMoveReset = false;
 
         if (
-            2 == abs($move->from[0]->rank() - $move->to[0]->rank())
-            && $move->from[0]->file() == $move->to[0]->file()
-            && Pawn::class == $this->board->pieceOn($move->from[0])::class
+            Pawn::class == $this->board->pieceOn($move->from[0])::class
+            && 2 == $move->rankDifference()
+            && $move->staysOnFile()
         ) {
             $this->enPassantTargetSquare = $move->to[0];
         }
@@ -80,8 +80,8 @@ class Game
             $halfMoveReset = true;
         }
 
-        foreach ($move->from as $x => $from) {
-            if (King::class == $this->board->pieceOn($from)::class && abs($move->from[$x]->file() - $move->to[$x]->file()) > 1) {
+        foreach ($move->from as $from) {
+            if (King::class == $this->board->pieceOn($from)::class && $move->fileDifference() > 1) {
                 // castle
                 if (Color::WHITE == $this->currentColor()) {
                     $this->castlingAvailability->whiteCanCastleQueenside = false;

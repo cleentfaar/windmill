@@ -22,24 +22,21 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     public function encode(Move $move, Game $game): string
     {
-        $moveFrom = $move->from[0];
-        $moveTo = $move->to[0];
-        $movingPiece = $game->board->pieceOn($moveFrom);
+        $movingPiece = $game->board->pieceOn($move->from[0]);
 
-        if (King::class == $movingPiece::class && abs($moveFrom->file() - $moveTo->file()) > 1) {
+        if (King::class == $movingPiece::class) {
             // castling
-            $jumpSize = abs($moveFrom->file() - $moveTo->file());
-
-            if ($jumpSize > 2) {
+            if ($move->fileDifference() > 2) {
                 return '0-0-0';
-            } else {
+            } elseif (2 == $move->fileDifference()) {
                 return '0-0';
             }
         }
 
+        $moveTo = $move->to[0];
         $isCapture = sizeof($move->to) > 1 && 1 == sizeof(array_filter($move->to));
         $captureablePiecePosition = isset($move->from[1]) ? ($move->from[1] == $move->to[0] ? $move->to[0] : $move->from[1]) : $move->to[0];
-        $firstChar = $this->encodeMovingPieceChar($moveFrom, $captureablePiecePosition, $game->board);
+        $firstChar = $this->encodeMovingPieceChar($move->from[0], $captureablePiecePosition, $game->board);
         $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $game);
         $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
 

@@ -16,50 +16,27 @@ class AlgebraicPieceEncoder implements PieceEncoderInterface
 {
     public function encode(AbstractPiece $decodedPiece, Position $position): string
     {
-        switch ($decodedPiece::class) {
-            case Bishop::class:
-                return 'B';
-            case Knight::class:
-                return 'N';
-            case Rook::class:
-                return 'R';
-            case Queen::class:
-                return 'Q';
-            case King::class:
-                return 'K';
-            case Pawn::class:
-                return $position->fileLetter();
-            default:
-                throw new \Exception(sprintf('Unsupported piece: %s', $decodedPiece::class));
-        }
+        return match ($decodedPiece::class) {
+            Bishop::class => 'B',
+            Knight::class => 'N',
+            Rook::class => 'R',
+            Queen::class => 'Q',
+            King::class => 'K',
+            Pawn::class => $position->fileLetter(),
+            default => throw new \Exception(sprintf('Unsupported piece: %s', $decodedPiece::class)),
+        };
     }
 
     public function decode(string $encodedPiece, Color $color): AbstractPiece
     {
-        switch ($encodedPiece) {
-            case 'B':
-                return new Bishop($color);
-            case 'N':
-                return new Knight($color);
-            case 'R':
-                return new Rook($color);
-            case 'Q':
-                return new Queen($color);
-            case 'K':
-            case '0':
-            case 'O':
-                return new King($color);
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-            case 'g':
-            case 'h':
-                return new Pawn($color);
-            default:
-                throw new \Exception(sprintf('Unsupported SAN piece: %s', $encodedPiece));
-        }
+        return match ($encodedPiece) {
+            'B' => new Bishop($color),
+            'N' => new Knight($color),
+            'R' => new Rook($color),
+            'Q' => new Queen($color),
+            'K', '0', 'O' => new King($color),
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' => new Pawn($color),
+            default => throw new \Exception(sprintf('Unsupported SAN piece: %s', $encodedPiece)),
+        };
     }
 }
