@@ -6,7 +6,7 @@ use App\Windmill\Board;
 use App\Windmill\Color;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 use App\Windmill\Player;
 use App\Windmill\Presentation\Encoder\AsciiBoardEncoder;
 use App\Windmill\Presentation\Encoder\SANMoveEncoder;

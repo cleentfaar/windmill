@@ -2,7 +2,7 @@
 
 namespace App\Windmill\Piece;
 
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 
 class PieceHistory
 {

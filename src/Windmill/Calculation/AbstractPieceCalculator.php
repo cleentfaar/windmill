@@ -4,7 +4,7 @@ namespace App\Windmill\Calculation;
 
 use App\Windmill\Color;
 use App\Windmill\Game;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 use App\Windmill\Position;
 
 abstract class AbstractPieceCalculator

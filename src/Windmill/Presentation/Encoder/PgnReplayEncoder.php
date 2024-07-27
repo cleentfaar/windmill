@@ -6,7 +6,7 @@ use AmyBoyd\PgnParser\Game as PgnGame;
 use AmyBoyd\PgnParser\PgnParser;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 use App\Windmill\Presentation\Replay;
 
 class PgnReplayEncoder implements ReplayEncoderInterface

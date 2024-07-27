@@ -6,7 +6,7 @@ use App\Windmill\Board;
 use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
-use App\Windmill\Move\Move;
+use App\Windmill\Move;
 use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;

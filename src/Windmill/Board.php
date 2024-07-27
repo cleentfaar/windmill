@@ -2,7 +2,6 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Move\Move;
 use App\Windmill\Piece\AbstractPiece;
 use Symfony\Component\Uid\Uuid;
 

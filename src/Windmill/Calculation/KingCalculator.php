@@ -5,8 +5,8 @@ namespace App\Windmill\Calculation;
 use App\Windmill\BoardWalker;
 use App\Windmill\Color;
 use App\Windmill\Game;
-use App\Windmill\Move\Move;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\Move;
+use App\Windmill\MoveCollection;
 use App\Windmill\Piece\Rook;
 use App\Windmill\Position;
 

@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Windmill\Move;
-
-use App\Windmill\Position;
+namespace App\Windmill;
 
 class MoveCollection
 {

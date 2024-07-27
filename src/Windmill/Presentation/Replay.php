@@ -3,7 +3,7 @@
 namespace App\Windmill\Presentation;
 
 use App\Windmill\Game;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 
 class Replay
 {

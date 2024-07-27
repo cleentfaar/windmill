@@ -5,7 +5,7 @@ namespace App\Tests\Windmill\Calculation;
 use App\Tests\AbstractTestCase;
 use App\Windmill\Calculation\AbstractPieceCalculator;
 use App\Windmill\Color;
-use App\Windmill\Move\MoveCollection;
+use App\Windmill\MoveCollection;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Position;
 

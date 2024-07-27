@@ -7,7 +7,7 @@ use App\Windmill\Color;
 use App\Windmill\Engine\Random;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
-use App\Windmill\Move\Move;
+use App\Windmill\Move;
 use App\Windmill\Persistence\GameRepository;
 use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\SymfonyConsoleBoardEncoder;

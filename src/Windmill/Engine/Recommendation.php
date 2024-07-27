@@ -2,7 +2,7 @@
 
 namespace App\Windmill\Engine;
 
-use App\Windmill\Move\Move;
+use App\Windmill\Move;
 
 class Recommendation
 {

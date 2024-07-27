@@ -3,7 +3,7 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Game;
-use App\Windmill\Move\Move;
+use App\Windmill\Move;
 
 interface MoveEncoderInterface
 {

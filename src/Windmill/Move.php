@@ -1,9 +1,6 @@
 <?php
 
-namespace App\Windmill\Move;
-
-use App\Windmill\Board;
-use App\Windmill\Color;
+namespace App\Windmill;
 
 class Move
 {
