@@ -3,11 +3,11 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Game;
-use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\Move;
 
 interface MoveEncoderInterface
 {
-    public function encode(AbstractMove $move, Game $game): string;
+    public function encode(Move $move, Game $game): string;
 
-    public function decode(mixed $algebraic, Game $game): AbstractMove;
+    public function decode(mixed $algebraic, Game $game): Move;
 }

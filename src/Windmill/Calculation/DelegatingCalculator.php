@@ -5,10 +5,8 @@ namespace App\Windmill\Calculation;
 use App\Windmill\CheckState;
 use App\Windmill\Color;
 use App\Windmill\Game;
-use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\Move;
 use App\Windmill\Move\MoveCollection;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\Bishop;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Knight;
@@ -61,12 +59,7 @@ class DelegatingCalculator
 
         foreach ($this->calculate($game)->all() as $move) {
             switch ($move::class) {
-                case SimpleMove::class:
-                    if ($move->to == $to) {
-                        $remaining->add($move);
-                    }
-                    break;
-                case MultiMove::class:
+                case Move::class:
                     foreach ($move->to as $toInMove) {
                         if ($toInMove == $to) {
                             $remaining->add($move);
@@ -84,7 +77,7 @@ class DelegatingCalculator
         $moves = new MoveCollection();
 
         foreach ($this->calculate($game)->all() as $move) {
-            $moveFrom = SimpleMove::class == $move::class ? $move->from : $move->from[0];
+            $moveFrom = $move->from[0];
 
             if ($moveFrom == $position) {
                 $moves->add($move);
@@ -94,9 +87,9 @@ class DelegatingCalculator
         return $moves;
     }
 
-    public function calculcateCheckState(AbstractMove $move, Game $game): CheckState
+    public function calculcateCheckState(Move $move, Game $game): CheckState
     {
-        $moveFrom = SimpleMove::class == $move::class ? $move->from : $move->from[0];
+        $moveFrom = $move->from[0];
         $movingPiece = $game->board->pieceOn($moveFrom);
         $clone = clone $game;
         $clone->move($move, true);
@@ -127,7 +120,7 @@ class DelegatingCalculator
             foreach ($movesByKing as $moveByKing) {
                 $g = clone $clone;
                 $g->move($moveByKing);
-                $newKingDestination = SimpleMove::class == $moveByKing::class ? $moveByKing->to : $moveByKing->to[0];
+                $newKingDestination = $moveByKing->to[0];
                 $movesStillAttackingKing = $this->calculateWithDestination($newKingDestination, $g)->all();
 
                 if (sizeof($movesStillAttackingKing) > 0) {
@@ -147,13 +140,9 @@ class DelegatingCalculator
         $eligible = [];
 
         foreach ($moves as $m) {
-            if (SimpleMove::class == $m::class && $game->board->pieceOn($m->from)::class == $pieceClass) {
-                $eligible[] = $m;
-            } elseif (MultiMove::class == $m::class) {
-                foreach ($m->to as $x => $t) {
-                    if ($t == $destination && $game->board->pieceOn($m->from[$x])::class == $pieceClass) {
-                        $eligible[] = $m;
-                    }
+            foreach ($m->to as $x => $t) {
+                if ($t == $destination && $game->board->pieceOn($m->from[$x])::class == $pieceClass) {
+                    $eligible[] = $m;
                 }
             }
         }

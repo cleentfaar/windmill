@@ -29,7 +29,6 @@ WHERE id = :id
 END, ['id' => $id], self::TYPES);
 
         if (false !== $board) {
-            dump($board);
             // TODO find out why decoding is not automatic
             $wp = (array) json_decode($board['squares']);
 

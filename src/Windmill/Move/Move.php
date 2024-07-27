@@ -5,7 +5,7 @@ namespace App\Windmill\Move;
 use App\Windmill\Board;
 use App\Windmill\Color;
 
-class MultiMove extends AbstractMove
+class Move
 {
     public function __construct(
         public readonly array $from,

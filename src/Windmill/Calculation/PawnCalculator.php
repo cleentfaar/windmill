@@ -5,9 +5,8 @@ namespace App\Windmill\Calculation;
 use App\Windmill\BoardWalker;
 use App\Windmill\Color;
 use App\Windmill\Game;
+use App\Windmill\Move\Move;
 use App\Windmill\Move\MoveCollection;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
 use App\Windmill\Position;
 
 class PawnCalculator extends AbstractPieceCalculator
@@ -33,7 +32,7 @@ class PawnCalculator extends AbstractPieceCalculator
         $to = $walker->forward(1)->current();
 
         if ($to && !$game->board->pieceOn($to)) {
-            $moveCollection->add(new SimpleMove($currentPosition, $to));
+            $moveCollection->add(new Move([$currentPosition], [$to]));
         }
 
         $walker->reset();
@@ -43,7 +42,7 @@ class PawnCalculator extends AbstractPieceCalculator
             $to = $walker->forward(2)->current();
 
             if ($to && !$game->board->pieceOn($to)) {
-                $m = new SimpleMove($currentPosition, $to);
+                $m = new Move([$currentPosition], [$to]);
                 $moveCollection->add($m);
             }
         }
@@ -61,7 +60,7 @@ class PawnCalculator extends AbstractPieceCalculator
             $opponentPiece = $game->board->pieceOn($forwardLeft);
 
             if ($opponentPiece && $opponentPiece->color !== $currentColor) {
-                $moveCollection->add(new MultiMove([$currentPosition, $forwardLeft], [$forwardLeft, null]));
+                $moveCollection->add(new Move([$currentPosition, $forwardLeft], [$forwardLeft, null]));
             }
         }
 
@@ -73,7 +72,7 @@ class PawnCalculator extends AbstractPieceCalculator
             $opponentPiece = $game->board->pieceOn($forwardRight);
 
             if ($opponentPiece && $opponentPiece->color !== $currentColor) {
-                $moveCollection->add(new MultiMove([$currentPosition, $forwardRight], [$forwardRight, null]));
+                $moveCollection->add(new Move([$currentPosition, $forwardRight], [$forwardRight, null]));
             }
         }
 
@@ -102,7 +101,7 @@ class PawnCalculator extends AbstractPieceCalculator
             if ($destination == $enPassantTarget) {
                 $enPassantWalker = new BoardWalker($enPassantTarget, Color::oppositeOf($currentColor), $game->board);
                 $positionOfPieceToCapture = $enPassantWalker->forward(1, false, true)->current();
-                $moveCollection->add(new MultiMove([$currentPosition, $positionOfPieceToCapture], [$enPassantTarget, null]));
+                $moveCollection->add(new Move([$currentPosition, $positionOfPieceToCapture], [$enPassantTarget, null]));
             }
         }
     }

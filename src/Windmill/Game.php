@@ -2,16 +2,14 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Move\AbstractMove;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
+use App\Windmill\Move\Move;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use Symfony\Component\Uid\Uuid;
 
 class Game
 {
-    private ?AbstractMove $lastMove = null;
+    private ?Move $lastMove = null;
 
     public function __construct(
         public readonly Uuid $id,
@@ -29,7 +27,7 @@ class Game
     ) {
     }
 
-    public function move(AbstractMove $move, bool $virtual = false)
+    public function move(Move $move, bool $virtual = false)
     {
         $this->updateStatesBeforeExecutingMove($move);
         $this->board->move($move);
@@ -66,49 +64,41 @@ class Game
         return Color::WHITE == $this->colorToMove ? $this->whitePlayer : $this->blackPlayer;
     }
 
-    private function updateStatesBeforeExecutingMove(AbstractMove $move): void
+    private function updateStatesBeforeExecutingMove(Move $move): void
     {
         $halfMoveReset = false;
 
-        switch ($move::class) {
-            case SimpleMove::class:
-                if (
-                    2 == abs($move->from->rank() - $move->to->rank())
-                    && $move->from->file() == $move->to->file()
-                    && Pawn::class == $this->board->pieceOn($move->from)::class
-                ) {
-                    $this->enPassantTargetSquare = $move->to;
-                }
-                if (Pawn::class == $this->board->pieceOn($move->from)::class) {
-                    // pawn is moving
-                    $halfMoveReset = true;
-                }
-                break;
-            case MultiMove::class:
-                foreach ($move->from as $x => $from) {
-                    if (!$this->board->pieceOn($from)) {
-                        dump($from);
-                    }
-                    if (King::class == $this->board->pieceOn($from)::class && abs($move->from[$x]->file() - $move->to[$x]->file()) > 1) {
-                        // castle
-                        if (Color::WHITE == $this->currentColor()) {
-                            $this->castlingAvailability->whiteCanCastleQueenside = false;
-                            $this->castlingAvailability->whiteCanCastleKingside = false;
-                        } else {
-                            $this->castlingAvailability->blackCanCastleQueenside = false;
-                            $this->castlingAvailability->blackCanCastleKingside = false;
-                        }
-                    }
-                }
+        if (
+            2 == abs($move->from[0]->rank() - $move->to[0]->rank())
+            && $move->from[0]->file() == $move->to[0]->file()
+            && Pawn::class == $this->board->pieceOn($move->from[0])::class
+        ) {
+            $this->enPassantTargetSquare = $move->to[0];
+        }
 
-                foreach ($move->to as $x => $to) {
-                    if (null == $to && $this->board->pieceOn($move->from[$x])->color != $this->currentColor()) {
-                        // capture
-                        $halfMoveReset = true;
-                    }
-                }
+        if (Pawn::class == $this->board->pieceOn($move->from[0])::class) {
+            // pawn is moving
+            $halfMoveReset = true;
+        }
 
-                break;
+        foreach ($move->from as $x => $from) {
+            if (King::class == $this->board->pieceOn($from)::class && abs($move->from[$x]->file() - $move->to[$x]->file()) > 1) {
+                // castle
+                if (Color::WHITE == $this->currentColor()) {
+                    $this->castlingAvailability->whiteCanCastleQueenside = false;
+                    $this->castlingAvailability->whiteCanCastleKingside = false;
+                } else {
+                    $this->castlingAvailability->blackCanCastleQueenside = false;
+                    $this->castlingAvailability->blackCanCastleKingside = false;
+                }
+            }
+        }
+
+        foreach ($move->to as $x => $to) {
+            if (null == $to && $this->board->pieceOn($move->from[$x])->color != $this->currentColor()) {
+                // capture
+                $halfMoveReset = true;
+            }
         }
 
         if ($halfMoveReset) {

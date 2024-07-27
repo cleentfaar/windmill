@@ -3,7 +3,7 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Game;
-use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\Move;
 use App\Windmill\Move\MultiMove;
 use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\Pawn;
@@ -16,7 +16,7 @@ class VerboseMoveEncoder implements MoveEncoderInterface
     ) {
     }
 
-    public function encode(AbstractMove $move, Game $game): string
+    public function encode(MultiMove $move, Game $game): string
     {
         $encoded = '';
         $algebraic = $this->moveEncoder->encode($move, $game);
@@ -51,7 +51,7 @@ class VerboseMoveEncoder implements MoveEncoderInterface
             case SimpleMove::class:
                 $encoded .= ' '.$move->to->name;
                 break;
-            case MultiMove::class:
+            case Move::class:
                 $encoded .= ' '.$move->to[0]->name;
                 break;
         }
@@ -59,7 +59,7 @@ class VerboseMoveEncoder implements MoveEncoderInterface
         return $encoded;
     }
 
-    public function decode(mixed $algebraic, Game $game): AbstractMove
+    public function decode(mixed $algebraic, Game $game): MultiMove
     {
     }
 }

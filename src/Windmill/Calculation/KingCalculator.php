@@ -5,9 +5,8 @@ namespace App\Windmill\Calculation;
 use App\Windmill\BoardWalker;
 use App\Windmill\Color;
 use App\Windmill\Game;
+use App\Windmill\Move\Move;
 use App\Windmill\Move\MoveCollection;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
 use App\Windmill\Piece\Rook;
 use App\Windmill\Position;
 
@@ -43,49 +42,49 @@ class KingCalculator extends AbstractPieceCalculator
         $walker->reset();
 
         if ($position = $walker->forward()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->backward()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->left()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->right()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->forwardLeft()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->forwardRight()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->backwardLeft()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
 
         if ($position = $walker->backwardRight()->current()) {
-            $moveCollection->add(new SimpleMove($walker->startingPosition, $position));
+            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
         }
 
         $walker->reset();
@@ -111,7 +110,7 @@ class KingCalculator extends AbstractPieceCalculator
             return;
         }
 
-        $moveCollection->add(new MultiMove(
+        $moveCollection->add(new Move(
             [$walker->startingPosition, $walker->absoluteRight()->current()],
             [$rookPosition, $walker->absoluteLeft()->current()]
         ));
@@ -139,7 +138,7 @@ class KingCalculator extends AbstractPieceCalculator
             return;
         }
 
-        $move = new MultiMove(
+        $move = new Move(
             [$walker->startingPosition, $rookPosition],
             [$walker->absoluteLeft(1, true)->current(), $walker->absoluteLeft(1, true)->current()],
             'castle'

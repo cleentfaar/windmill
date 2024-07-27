@@ -37,7 +37,6 @@ END, ['id' => $id], self::TYPES);
 
         if (false !== $game) {
             $board = $this->boardRepository->find($game['board_id']);
-            dump($game);
             // TODO find out why decoding is not automatic
             $wp = (array) json_decode($game['white_player']);
             $bp = (array) json_decode($game['black_player']);

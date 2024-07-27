@@ -10,14 +10,14 @@ class MoveCollection
     {
     }
 
-    public function add(AbstractMove $move): void
+    public function add(Move $move): void
     {
         $this->moves[] = $move;
     }
 
     public function from(Position $position): array
     {
-        return array_filter($this->moves, function (AbstractMove $m) use ($position) {
+        return array_filter($this->moves, function (Move $m) use ($position) {
             return in_array(
                 $position->value,
                 array_map(

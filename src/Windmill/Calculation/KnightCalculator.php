@@ -5,9 +5,8 @@ namespace App\Windmill\Calculation;
 use App\Windmill\BoardWalker;
 use App\Windmill\Color;
 use App\Windmill\Game;
+use App\Windmill\Move\Move;
 use App\Windmill\Move\MoveCollection;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
 use App\Windmill\Position;
 
 class KnightCalculator extends AbstractPieceCalculator
@@ -32,16 +31,15 @@ class KnightCalculator extends AbstractPieceCalculator
 
         foreach ($lShapes as $posCallback) {
             if ($pos = $posCallback()) {
-                $targetPiece = $game->board->pieceOn($pos);
+                $from = [$currentPosition];
+                $to = [$pos];
 
-                if (!$targetPiece) {
-                    $moves->add(new SimpleMove($currentPosition, $pos));
-                } elseif ($targetPiece->color != $currentColor) {
-                    $moves->add(new MultiMove(
-                        [$currentPosition, $pos],
-                        [$pos, null]
-                    ));
+                if ($game->board->pieceOn($pos)) {
+                    $from[] = $pos;
+                    $to[] = null;
                 }
+
+                $moves->add(new Move($from, $to));
             }
 
             $walker->reset();

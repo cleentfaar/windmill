@@ -2,9 +2,7 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Move\AbstractMove;
-use App\Windmill\Move\MultiMove;
-use App\Windmill\Move\SimpleMove;
+use App\Windmill\Move\Move;
 use App\Windmill\Piece\AbstractPiece;
 use Symfony\Component\Uid\Uuid;
 
@@ -116,37 +114,26 @@ class Board
         return $positions;
     }
 
-    public function move(AbstractMove $move): void
+    public function move(Move $move): void
     {
-        switch ($move::class) {
-            case SimpleMove::class:
-                $piece = $this->pieceOn($move->from);
-                $this->squares[$move->from->value] = null;
-                $this->squares[$move->to->value] = $piece;
-                break;
-            case MultiMove::class:
-                foreach ($move->to as $x => $to) {
-                    if (null == $to) {
-                        $from = $move->from[$x];
-                        $this->squares[$from->value] = null;
-                    }
+        foreach ($move->to as $x => $to) {
+            if (null == $to) {
+                $from = $move->from[$x];
+                $this->squares[$from->value] = null;
+            }
+        }
+
+        foreach ($move->from as $x => $from) {
+            $to = $move->to[$x];
+
+            if (null !== $to) {
+                $movingPiece = $this->squares[$from->value];
+                if ($move->to[$x]) {
+                    $this->squares[$move->to[$x]->value] = $movingPiece;
                 }
 
-                foreach ($move->from as $x => $from) {
-                    $to = $move->to[$x];
-
-                    if (null !== $to) {
-                        $movingPiece = $this->squares[$from->value];
-                        if ($move->to[$x]) {
-                            $this->squares[$move->to[$x]->value] = $movingPiece;
-                        }
-
-                        $this->squares[$from->value] = null;
-                    }
-                }
-                break;
-            default:
-                throw new \Exception(sprintf('Unsupported move class: %s', $move::class));
+                $this->squares[$from->value] = null;
+            }
         }
     }
 }

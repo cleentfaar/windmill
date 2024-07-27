@@ -7,7 +7,7 @@ use App\Windmill\Color;
 use App\Windmill\Engine\Random;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
-use App\Windmill\Move\AbstractMove;
+use App\Windmill\Move\MultiMove;
 use App\Windmill\Persistence\GameRepository;
 use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\SymfonyConsoleBoardEncoder;
@@ -87,10 +87,10 @@ class WindmillPlayCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function askForNextMove(Game $game, InputInterface $input, ConsoleSectionOutput $section): AbstractMove
+    private function askForNextMove(Game $game, InputInterface $input, ConsoleSectionOutput $section): MultiMove
     {
         $moves = $this->calculator->calculate($game);
-        $moveFENs = array_map(function (AbstractMove $move) use ($game) {
+        $moveFENs = array_map(function (MultiMove $move) use ($game) {
             return $this->moveEncoder->encode($move, $game);
         }, $moves->all());
 
