@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\Color;
 use App\Windmill\Engine\Random;
+use App\Windmill\Engine\RecommendationEngineInterface;
 use App\Windmill\Engine\SymfonyConsoleHuman;
 use App\Windmill\GameFactory;
 use App\Windmill\Presentation\Encoder\SymfonyConsoleBoardEncoder;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
@@ -44,9 +46,9 @@ class WindmillPlayCommand extends Command
 
         $game = $this->gameFactory->standard(
             $input->getOption('color') == Color::WHITE->name ? 'Human' : 'Computer',
-            $input->getOption('color') == Color::WHITE->name ? new SymfonyConsoleHuman($input, $questionSection) : new Random($this->calculator),
+            $this->createEngine(Color::WHITE == Color::fromName($input->getOption('color')), $input, $questionSection),
             $input->getOption('color') == Color::BLACK->name ? 'Human' : 'Computer',
-            $input->getOption('color') == Color::BLACK->name ? new SymfonyConsoleHuman($input, $questionSection) : new Random($this->calculator),
+            $this->createEngine(Color::BLACK == Color::fromName($input->getOption('color')), $input, $questionSection),
         );
 
         while (!$game->isFinished()) {
@@ -63,5 +65,16 @@ class WindmillPlayCommand extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    private function createEngine(
+        bool $human,
+        InputInterface $input,
+        ConsoleSectionOutput $questionSection
+    ): RecommendationEngineInterface {
+        return $human
+            ? new SymfonyConsoleHuman($input, $questionSection)
+            : new Random()
+        ;
     }
 }

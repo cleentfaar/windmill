@@ -23,11 +23,6 @@ class MoveCollection
         }));
     }
 
-    public function filter(callable $callback): MoveCollection
-    {
-        return new MoveCollection(array_filter($this->moves, $callback));
-    }
-
     public function all(): array
     {
         return $this->moves;
