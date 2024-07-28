@@ -50,8 +50,10 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     public function decode(mixed $algebraic, Game $game): Move
     {
+        $color = $game->currentColor();
         $algebraic = str_replace('O', '0', $algebraic);
         $possibleMoves = [];
+        $impossibleMoves = [];
         $availableMoves = $this->calculator->calculate($game);
 
         foreach ($availableMoves as $move) {
@@ -59,10 +61,13 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
             if ($encoded == $algebraic) {
                 $possibleMoves[$encoded] = $move;
+            } else {
+                $impossibleMoves[$encoded] = $move;
             }
         }
 
         if (1 != sizeof($possibleMoves)) {
+            dump($color, array_keys($impossibleMoves));
             dump((new AsciiBoardEncoder(true, true, ' '))->encode($game->board));
             throw new \Exception(sprintf("Expected exactly one possible move that results into '%s', got %d%s", $algebraic, sizeof($possibleMoves), sizeof($possibleMoves) > 0 ? sprintf(' (%s)', implode(',', array_keys($possibleMoves))) : ''));
         }

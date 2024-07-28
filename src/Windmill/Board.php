@@ -2,6 +2,7 @@
 
 namespace App\Windmill;
 
+use Exception;
 use Symfony\Component\Uid\Uuid;
 
 class Board
@@ -82,9 +83,9 @@ class Board
 
     public function __construct(
         public readonly Uuid $id,
-        private readonly array $occupiedSquares = []
+        array $occupiedSquares = []
     ) {
-        foreach ($this->occupiedSquares as $position => $piece) {
+        foreach ($occupiedSquares as $position => $piece) {
             $this->squares[$position] = $piece;
         }
     }
@@ -99,11 +100,29 @@ class Board
         return $this->squares[$position->value] ?? null;
     }
 
+    public function kingPosition(Color $kingColor): Position
+    {
+        $squares = $this->squaresWithPiece(
+            PieceType::KING,
+            $kingColor
+        );
+
+        if (sizeof($squares) <> 1) {
+            throw new Exception(sprintf(
+                'Expected a single square to be found with a %s king, got %d',
+                $kingColor->name(),
+                sizeof($squares)
+            ));
+        }
+
+        return $squares[0];
+    }
+
     public function squaresWithPiece(PieceType $type, Color $color): array
     {
         $positions = [];
 
-        foreach ($this->squares() as $square => $piece) {
+        foreach ($this->squares as $square => $piece) {
             if ($piece && $piece->type == $type && $piece->color == $color) {
                 $positions[] = Position::tryFrom($square);
             }

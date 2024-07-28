@@ -31,3 +31,6 @@ cs-fix: ## Fixes code style issues
 
 test: ## Runs all tests
 	docker compose run --rm php bin/phpunit
+
+demo: ## Replays all 'famous games' stored in this project
+	for i in ./datasets/famous_games/*.pgn; do bin/console w:r $$i --no-interaction; done

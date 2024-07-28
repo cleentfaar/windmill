@@ -24,7 +24,7 @@ class EndToEndGameTest extends AbstractTestCase
             try {
                 $game->move($moveEncoder->decode($move, $game));
             } catch (\Exception $e) {
-                dump((new AsciiBoardEncoder())->encode($game->board));
+//                dump((new AsciiBoardEncoder(true, true, ' '))->encode($game->board));
                 throw $e;
             }
             $this->assertEquals($state, $gameEncoder->encode($game), sprintf('Failed on %s', $move));

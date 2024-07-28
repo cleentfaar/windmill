@@ -55,17 +55,17 @@ class DelegatingCalculatorTest extends AbstractTestCase
     {
         return [
             'none' => [
-                'k7/8/1R6/2Q5/8/8/8/8 w - - 0 1',
+                'k7/8/1R6/2Q5/8/8/8/4K3 w - - 0 1',
                 new Move([Position::C5], [Position::B5]),
                 CheckState::NONE,
             ],
             'check' => [
-                'k7/8/1R6/2Q5/8/8/8/8 w - - 0 1',
+                'k7/8/1R6/2Q5/8/8/8/4K3 w - - 0 1',
                 new Move([Position::C5], [Position::C6]),
                 CheckState::CHECK,
             ],
             'checkmate' => [
-                'k7/8/1R6/2Q5/8/8/8/8 w - - 0 1',
+                'k7/8/1R6/2Q5/8/8/8/4K3 w - - 0 1',
                 new Move([Position::C5], [Position::A5]),
                 CheckState::CHECKMATE,
             ],

@@ -54,14 +54,9 @@ class DelegatingCalculator
         $movingPiece = $game->board->pieceOn($move->primary->from);
         $clone = clone $game;
         $clone->move($move, true);
-        $squaresWithOppositeKing = $clone->board->squaresWithPiece(PieceType::KING, Color::oppositeOf($movingPiece->color));
-
-        if (1 != sizeof($squaresWithOppositeKing)) {
-            return CheckState::NONE;
-        }
-
+        $oppositeKingPosition = $clone->board->kingPosition(Color::oppositeOf($movingPiece->color));
         $moveCollection = $this->calculate($clone);
-        $movesAttackingKing = $moveCollection->to($squaresWithOppositeKing[0]);
+        $movesAttackingKing = $moveCollection->to($oppositeKingPosition);
 
         if (0 == sizeof($movesAttackingKing)) {
             return CheckState::NONE;
@@ -70,17 +65,17 @@ class DelegatingCalculator
         $clone = clone $game;
         $clone->move($move); // now king is checked, we need to see if he can escape
 
-        $kingMoves = $this->calculate($clone);
         $canEscape = true;
 
-        foreach ($kingMoves as $kingMove) {
-            $c = clone $clone;
-            $c->move($kingMove);
-            $mc = $this->calculate($c);
-            $sqk = $c->board->squaresWithPiece(PieceType::KING, Color::oppositeOf($movingPiece->color));
-            $mk = $mc->to($sqk[0]);
+        foreach ($this->calculate($clone) as $moveToTryDefendTheKing) {
+            $cloneForDefendingKing = clone $clone;
+            $cloneForDefendingKing->move($moveToTryDefendTheKing);
 
-            if (0 == sizeof($mk)) {
+            $movesThayMayStillBeAttackingKing = $this->calculate($cloneForDefendingKing);
+            $currentKingSquare = $cloneForDefendingKing->board->kingPosition(Color::oppositeOf($movingPiece->color)); // needs to be recalculated as one of the moves may involve moving the king
+            $movesThatAreStillAttackingKing = $movesThayMayStillBeAttackingKing->to($currentKingSquare);
+
+            if (0 == sizeof($movesThatAreStillAttackingKing)) {
                 // at least one way to escape
                 return CheckState::CHECK;
             } else {
