@@ -26,7 +26,6 @@ class PgnReplayEncoder implements ReplayEncoderInterface
         $parser = new PgnParser($game);
         $parsedGame = $parser->getGame(0);
         $game = $this->createGameFromMetadata($parsedGame);
-        $state = $this->createStateFromMetadata($parsedGame);
         $moves = new MoveCollection();
 
         foreach ($parsedGame->getMovesArray() as $pgnMove) {
@@ -49,7 +48,9 @@ class PgnReplayEncoder implements ReplayEncoderInterface
         return new Replay(
             $this->createGameFromMetadata($parsedGame),
             $moves,
-            $state
+            $this->createStateFromMetadata($parsedGame),
+            $parsedGame->getEvent(),
+            $parsedGame->getSite(),
         );
     }
 

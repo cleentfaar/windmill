@@ -12,6 +12,8 @@ class Replay
         public readonly Game $game,
         public readonly MoveCollection $moves,
         public readonly State $state,
+        public readonly string $event,
+        public readonly string $site,
     ) {
     }
 }

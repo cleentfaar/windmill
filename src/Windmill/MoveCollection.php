@@ -23,6 +23,17 @@ class MoveCollection implements \IteratorAggregate, \Countable
         }));
     }
 
+    public function fromFile(int $file): MoveCollection
+    {
+        return new MoveCollection(array_filter($this->moves, function (Move $m) use ($file) {
+            foreach ($m->from as $from) {
+                if ($from->file() == $file) {
+                    return true;
+                }
+            }
+        }));
+    }
+
     public function pickRandom(): ?Move
     {
         $key = array_rand($this->moves);

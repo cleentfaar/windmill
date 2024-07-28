@@ -60,6 +60,13 @@ class WindmillReplayCommand extends Command
         $gameEncoder = new FENGameEncoder();
         $lastMove = null;
         $previousGame = null;
+        $output->writeln(sprintf(
+            'Replaying game: %s vs %s (%s played at %s)',
+            $game->whitePlayer->name,
+            $game->blackPlayer->name,
+            $replay->event,
+            $replay->site,
+        ));
 
         foreach ($replay->moves as $move) {
             $previousGame = clone $game;

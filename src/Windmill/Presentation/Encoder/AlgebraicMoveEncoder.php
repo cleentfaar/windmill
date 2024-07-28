@@ -7,7 +7,6 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
 use App\Windmill\Move;
-use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Rook;
@@ -42,7 +41,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         $isCapture = sizeof($move->to) > 1 && 1 == sizeof(array_filter($move->to));
         $captureablePiecePosition = isset($move->from[1]) ? ($move->from[1] == $move->to[0] ? $move->to[0] : $move->from[1]) : $move->to[0];
         $firstChar = $this->encodeMovingPieceChar($move->from[0], $captureablePiecePosition, $game->board);
-        $uniqueFile = $this->encodeUniqueFile($movingPiece, $move, $game);
+        $uniqueFile = $this->encodeUniqueFileOrRank($move, $game);
         $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
 
         return join('', [
@@ -77,16 +76,30 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         return array_shift($possibleMoves);
     }
 
-    private function encodeUniqueFile(AbstractPiece $movingPiece, Move $move, Game $game): string
+    private function encodeUniqueFileOrRank(Move $move, Game $game): string
     {
-        if ($this->calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(
+        $movesWithSameDestination = $this->calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(
             $move,
             $game
-        )->count() > 0) {
-            return $move->from[0]->fileLetter();
+        );
+
+        if (sizeof($movesWithSameDestination) == 0) {
+            return '';
         }
 
-        return '';
+        $movesWithSameFile = $movesWithSameDestination->fromFile($move->from[0]->file());
+
+        if (sizeof($movesWithSameFile) == 0) {
+            $movingPiece = $game->board->pieceOn($move->from[0]);
+
+            if ($movingPiece::class != Pawn::class) {
+                return $move->from[0]->fileLetter();
+            } else {
+                return '';
+            }
+        }
+
+        return $move->from[0]->rank();
     }
 
     private function encodeChecksOrCheckmatesOpponent(Move $move, Game $game): string
