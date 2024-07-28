@@ -4,7 +4,6 @@ namespace App\Tests\Windmill;
 
 use App\Tests\AbstractTestCase;
 use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
-use App\Windmill\Presentation\Encoder\AsciiBoardEncoder;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
 class EndToEndGameTest extends AbstractTestCase
@@ -24,7 +23,6 @@ class EndToEndGameTest extends AbstractTestCase
             try {
                 $game->move($moveEncoder->decode($move, $game));
             } catch (\Exception $e) {
-//                dump((new AsciiBoardEncoder(true, true, ' '))->encode($game->board));
                 throw $e;
             }
             $this->assertEquals($state, $gameEncoder->encode($game), sprintf('Failed on %s', $move));

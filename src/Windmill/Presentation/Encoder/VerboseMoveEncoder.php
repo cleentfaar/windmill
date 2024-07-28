@@ -29,7 +29,8 @@ class VerboseMoveEncoder implements MoveEncoderInterface
             );
         }
 
-        return sprintf('%s%s',
+        return sprintf(
+            '%s%s',
             $this->encodeMovingPiece($algebraic, $game->currentColor()),
             $destination
         );

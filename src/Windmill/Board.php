@@ -2,7 +2,6 @@
 
 namespace App\Windmill;
 
-use Exception;
 use Symfony\Component\Uid\Uuid;
 
 class Board
@@ -107,12 +106,8 @@ class Board
             $kingColor
         );
 
-        if (sizeof($squares) <> 1) {
-            throw new Exception(sprintf(
-                'Expected a single square to be found with a %s king, got %d',
-                $kingColor->name(),
-                sizeof($squares)
-            ));
+        if (sizeof($squares) != 1) {
+            throw new Exception(sprintf('Expected a single square to be found with a %s king, got %d', $kingColor->name(), sizeof($squares)));
         }
 
         return $squares[0];
