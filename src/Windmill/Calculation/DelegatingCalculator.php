@@ -86,8 +86,7 @@ class DelegatingCalculator
 
             if (0 == sizeof($mk)) {
                 // at least one way to escape
-                $canEscape = true;
-                break;
+                return CheckState::CHECK;
             } else {
                 $canEscape = false;
             }
@@ -96,19 +95,21 @@ class DelegatingCalculator
         return $canEscape ? CheckState::CHECK : CheckState::CHECKMATE;
     }
 
-    public function calculcateMultiplePiecesWithDestination(string $pieceClass, Position $destination, Game $game): bool
+    public function calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(Move $move, Game $game): MoveCollection
     {
-        $moves = $this->calculate($game)->to($destination);
+        $piece = $game->board->pieceOn($move->from[0]);
+        $moves = $this->calculate($game)->to($move->to[0]);
         $eligible = [];
 
         foreach ($moves as $m) {
             foreach ($m->to as $x => $t) {
-                if ($t == $destination && $game->board->pieceOn($m->from[$x])::class == $pieceClass) {
+                $fromPiece = $game->board->pieceOn($m->from[$x]);
+                if ($t == $move->to[0] && $fromPiece && $fromPiece::class == $piece::class && $m->from[$x] !== $move->from[0]) {
                     $eligible[] = $m;
                 }
             }
         }
 
-        return sizeof($eligible) > 1;
+        return new MoveCollection($eligible);
     }
 }

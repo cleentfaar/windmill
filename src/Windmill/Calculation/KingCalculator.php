@@ -24,83 +24,61 @@ class KingCalculator extends AbstractPieceCalculator
         $this->calculcateCastlingMoves($game, $walker, $moves);
     }
 
-    private function calculcateCastlingMoves(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
-    {
-        if (
-            (Color::WHITE == $game->currentColor() && !$game->castlingAvailability->whiteCanCastleQueenside && !$game->castlingAvailability->whiteCanCastleKingside)
-            || (Color::BLACK == $game->currentColor() && !$game->castlingAvailability->blackCanCastleQueenside && !$game->castlingAvailability->blackCanCastleKingside)
-        ) {
-            return;
-        }
-
-        $this->calculateQueensideCastlingMove($game, $walker, $moveCollection);
-        $this->calculateKingsideCastlingMove($game, $walker, $moveCollection);
-    }
-
     private function calculcateRegularMoves(Game $game, BoardWalker $walker, MoveCollection $moveCollection)
     {
         $walker->reset();
 
-        if ($position = $walker->forward()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
+        $moves = [
+            function (BoardWalker $walker) { return $walker->forward(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->forwardRight(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->right(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->backwardRight(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->backward(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->backwardLeft(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->left(1, true)->current(); },
+            function (BoardWalker $walker) { return $walker->forwardLeft(1, true)->current(); },
+        ];
+
+        foreach ($moves as $move) {
+            if ($position = $move($walker)) {
+                $capturedPiece = $game->board->pieceOn($position);
+
+                if (!$capturedPiece) {
+                    //                    dump('no capture on'.$position->name);
+                    $moveCollection->add(new Move([$walker->startingPosition], [$position]));
+                } elseif ($capturedPiece->color != $game->currentColor()) {
+                    $move1 = new Move([$walker->startingPosition, $position], [$position, null]);
+                    //                    dump('adding capture!', $move1);
+                    $moveCollection->add($move1);
+                }
+            }
+
+            $walker->reset();
+        }
+    }
+
+    private function calculcateCastlingMoves(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
+    {
+        if ($game->theoreticallyCanCastleKingside()) {
+            $this->calculateKingsideCastlingMove($game, $walker, $moveCollection);
         }
 
-        $walker->reset();
-
-        if ($position = $walker->backward()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
+        if ($game->theoreticallyCanCastleQueenside()) {
+            $this->calculateQueensideCastlingMove($game, $walker, $moveCollection);
         }
-
-        $walker->reset();
-
-        if ($position = $walker->left()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
-
-        if ($position = $walker->right()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
-
-        if ($position = $walker->forwardLeft()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
-
-        if ($position = $walker->forwardRight()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
-
-        if ($position = $walker->backwardLeft()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
-
-        if ($position = $walker->backwardRight()->current()) {
-            $moveCollection->add(new Move([$walker->startingPosition], [$position]));
-        }
-
-        $walker->reset();
     }
 
     private function calculateQueensideCastlingMove(Game $game, BoardWalker $walker, MoveCollection $moveCollection): void
     {
         $walker->reset();
 
-        if (!$walker->absoluteLeft()->absoluteLeft()->absoluteLeft()->current()) {
-            return;
-        }
-
-        $rookPosition = $walker->absoluteLeft(1, false, true)->current();
-
-        if (!$rookPosition) {
+        if (!$rookPosition = $walker
+            ->absoluteLeft()
+            ->absoluteLeft()
+            ->absoluteLeft()
+            ->absoluteLeft(1, true, true)
+            ->current()
+        ) {
             return;
         }
 
@@ -110,9 +88,14 @@ class KingCalculator extends AbstractPieceCalculator
             return;
         }
 
+        $walker = new BoardWalker($walker->startingPosition, $game->currentColor(), $game->board);
         $moveCollection->add(new Move(
-            [$walker->startingPosition, $walker->absoluteRight()->current()],
-            [$rookPosition, $walker->absoluteLeft()->current()]
+            [$walker->startingPosition, $rookPosition],
+            [
+                $walker->absoluteLeft(1, true, true)->absoluteLeft(1, true, true)->current(),
+                $walker->absoluteRight(1, true, true)->current(),
+            ],
+            'castle queenside'
         ));
 
         $walker->reset();
@@ -122,13 +105,12 @@ class KingCalculator extends AbstractPieceCalculator
     {
         $walker->reset();
 
-        if (!$walker->absoluteRight()->absoluteRight()->current()) {
-            return;
-        }
-
-        $rookPosition = $walker->absoluteRight(1, false, true)->current();
-
-        if (!$rookPosition) {
+        if (!$rookPosition = $walker
+            ->absoluteRight()
+            ->absoluteRight()
+            ->absoluteRight(1, true, true)
+            ->current()
+        ) {
             return;
         }
 
@@ -138,12 +120,12 @@ class KingCalculator extends AbstractPieceCalculator
             return;
         }
 
-        $move = new Move(
+        $walker = new BoardWalker($walker->startingPosition, $game->currentColor(), $game->board);
+        $moveCollection->add(new Move(
             [$walker->startingPosition, $rookPosition],
-            [$walker->absoluteLeft(1, true)->current(), $walker->absoluteLeft(1, true)->current()],
-            'castle'
-        );
-        $moveCollection->add($move);
+            [$walker->absoluteRight(1, true, true)->absoluteRight(1, true, true)->current(), $walker->absoluteLeft(1, true, true)->current()],
+            'castle kingside'
+        ));
 
         $walker->reset();
     }

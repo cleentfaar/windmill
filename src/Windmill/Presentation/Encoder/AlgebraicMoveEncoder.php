@@ -10,6 +10,7 @@ use App\Windmill\Move;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
+use App\Windmill\Piece\Rook;
 use App\Windmill\Position;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
@@ -25,11 +26,15 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         $movingPiece = $game->board->pieceOn($move->from[0]);
 
         if (King::class == $movingPiece::class) {
-            // castling
-            if ($move->fileDifference() > 2) {
-                return '0-0-0';
-            } elseif (2 == $move->fileDifference()) {
-                return '0-0';
+            $secondaryPiece = isset($move->from[1]) && isset($move->to[1]) ? $game->board->pieceOn($move->from[1]) : null;
+
+            if ($secondaryPiece && $secondaryPiece::class == Rook::class && $secondaryPiece->color == $movingPiece->color) {
+                // castling
+                if ($move->fileDifference(1) > 2) {
+                    return '0-0-0';
+                } elseif (2 == $move->fileDifference(1)) {
+                    return '0-0';
+                }
             }
         }
 
@@ -58,10 +63,6 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
         foreach ($availableMoves as $move) {
             $encoded = $this->encode($move, $game);
-            if (Position::D8 == $move->to[0]) {
-                //                dump($move, $encoded);
-                //                exit;
-            }
 
             if ($encoded == $algebraic) {
                 $possibleMoves[$encoded] = $move;
@@ -69,6 +70,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         }
 
         if (1 != sizeof($possibleMoves)) {
+            dump((new AsciiBoardEncoder(true, true, ' '))->encode($game->board));
             throw new \Exception(sprintf("Expected exactly one possible move that results into '%s', got %d%s", $algebraic, sizeof($possibleMoves), sizeof($possibleMoves) > 0 ? sprintf(' (%s)', implode(',', array_keys($possibleMoves))) : ''));
         }
 
@@ -77,11 +79,10 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     private function encodeUniqueFile(AbstractPiece $movingPiece, Move $move, Game $game): string
     {
-        if ($this->calculator->calculcateMultiplePiecesWithDestination(
-            $movingPiece::class,
-            $move->to[0],
+        if ($this->calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(
+            $move,
             $game
-        )) {
+        )->count() > 0) {
             return $move->from[0]->fileLetter();
         }
 

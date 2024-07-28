@@ -8,10 +8,6 @@ use App\Windmill\Piece\Pawn;
 
 class VerboseMoveEncoder implements MoveEncoderInterface
 {
-    private const array VERBOSE_MOVE_FIELDS = [
-        'piece' => 0,
-    ];
-
     public function __construct(
         private readonly AlgebraicMoveEncoder $moveEncoder = new AlgebraicMoveEncoder(),
         private readonly AlgebraicPieceEncoder $pieceEncoder = new AlgebraicPieceEncoder(),

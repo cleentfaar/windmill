@@ -9,6 +9,7 @@ use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\MoveCollection;
 use App\Windmill\Presentation\Replay;
+use App\Windmill\State;
 
 class PgnReplayEncoder implements ReplayEncoderInterface
 {
@@ -25,6 +26,7 @@ class PgnReplayEncoder implements ReplayEncoderInterface
         $parser = new PgnParser($game);
         $parsedGame = $parser->getGame(0);
         $game = $this->createGameFromMetadata($parsedGame);
+        $state = $this->createStateFromMetadata($parsedGame);
         $moves = new MoveCollection();
 
         foreach ($parsedGame->getMovesArray() as $pgnMove) {
@@ -44,7 +46,11 @@ class PgnReplayEncoder implements ReplayEncoderInterface
             }
         }
 
-        return new Replay($this->createGameFromMetadata($parsedGame), $moves);
+        return new Replay(
+            $this->createGameFromMetadata($parsedGame),
+            $moves,
+            $state
+        );
     }
 
     private function createGameFromMetadata(PgnGame $parsedGame): Game
@@ -55,5 +61,15 @@ class PgnReplayEncoder implements ReplayEncoderInterface
             $parsedGame->getBlack(),
             new Random(),
         );
+    }
+
+    private function createStateFromMetadata(PgnGame $parsedGame): State
+    {
+        return match ($parsedGame->getResult()) {
+            '1-0' => State::FINISHED_WHITE_WINS,
+            '1-1' => State::FINISHED_DRAW,
+            '0-1' => State::FINISHED_BLACK_WINS,
+            default => throw new \Exception(),
+        };
     }
 }

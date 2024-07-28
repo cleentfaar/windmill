@@ -8,6 +8,8 @@ use App\Windmill\Color;
 use App\Windmill\MoveCollection;
 use App\Windmill\Piece\AbstractPiece;
 use App\Windmill\Position;
+use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
+use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
 abstract class AbstractCalculatorTest extends AbstractTestCase
 {
@@ -40,7 +42,30 @@ abstract class AbstractCalculatorTest extends AbstractTestCase
         );
     }
 
+    /**
+     * @dataProvider fenAndExpectedMoveWithOutcomeProvider
+     */
+    public function testItCalculatesExpectedMoveWithOutcome(
+        string $fen,
+        string $algebraicMove,
+        string $expectedFen,
+    ) {
+        $game = self::createGameFromFEN($fen);
+        $move = (new AlgebraicMoveEncoder())->decode($algebraicMove, $game);
+        $game->move($move);
+
+        $this->assertEquals(
+            $expectedFen,
+            (new FENGameEncoder())->encode($game),
+        );
+    }
+
     abstract protected function fenAndExpectedMovesProvider(): array;
+
+    protected function fenAndExpectedMoveWithOutcomeProvider(): array
+    {
+        return [];
+    }
 
     abstract protected function createCalculator(): AbstractPieceCalculator;
 

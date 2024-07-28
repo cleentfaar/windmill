@@ -15,18 +15,18 @@ class Move
     ) {
     }
 
-    public function fileDifference(): int
+    public function fileDifference(int $index = 0): int
     {
-        return abs($this->from[0]->file() - $this->to[0]->file());
+        return abs($this->from[$index]->file() - $this->to[$index]->file());
     }
 
-    public function rankDifference(): int
+    public function rankDifference(int $index = 0): int
     {
-        return abs($this->from[0]->rank() - $this->to[0]->rank());
+        return abs($this->from[$index]->rank() - $this->to[$index]->rank());
     }
 
-    public function staysOnFile(): bool
+    public function staysOnFile(int $index = 0): bool
     {
-        return $this->from[0]->file() == $this->to[0]->file();
+        return $this->from[$index]->file() == $this->to[$index]->file();
     }
 }

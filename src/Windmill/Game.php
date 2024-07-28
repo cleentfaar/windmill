@@ -65,6 +65,22 @@ class Game
         return Color::WHITE == $this->colorToMove ? $this->whitePlayer : $this->blackPlayer;
     }
 
+    public function theoreticallyCanCastleKingside(): bool
+    {
+        return
+            (Color::WHITE == $this->currentColor() && $this->castlingAvailability->whiteCanCastleKingside)
+            || (Color::BLACK == $this->currentColor() && $this->castlingAvailability->blackCanCastleKingside)
+        ;
+    }
+
+    public function theoreticallyCanCastleQueenside(): bool
+    {
+        return
+            (Color::WHITE == $this->currentColor() && $this->castlingAvailability->whiteCanCastleKingside)
+            || (Color::BLACK == $this->currentColor() && $this->castlingAvailability->blackCanCastleKingside)
+        ;
+    }
+
     private function updateStatesBeforeExecutingMove(Move $move): void
     {
         $halfMoveReset = false;
@@ -75,6 +91,8 @@ class Game
             && $move->staysOnFile()
         ) {
             $this->enPassantTargetSquare = $move->to[0];
+        } else {
+            $this->enPassantTargetSquare = null;
         }
 
         if (Pawn::class == $this->board->pieceOn($move->from[0])::class) {

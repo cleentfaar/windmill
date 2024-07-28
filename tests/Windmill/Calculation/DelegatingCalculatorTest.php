@@ -7,6 +7,7 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Move;
 use App\Windmill\Position;
+use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 
 class DelegatingCalculatorTest extends AbstractTestCase
 {
@@ -20,6 +21,34 @@ class DelegatingCalculatorTest extends AbstractTestCase
         $actualCheckState = $calculator->calculcateCheckState($move, $game);
 
         $this->assertEquals($expectedState, $actualCheckState);
+    }
+
+    /**
+     * @dataProvider provideFenWithPieceDestinationAndExpectedMoves
+     */
+    public function testCalculcateUniqueDestination(string $fen, Move $move, array $expectedAlgebraics)
+    {
+        $game = self::createGameFromFEN($fen);
+        $calculator = new DelegatingCalculator();
+        $actualCollection = $calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource($move, $game);
+        $actualAlgebraics = [];
+
+        foreach ($actualCollection as $move) {
+            $actualAlgebraics[] = (new AlgebraicMoveEncoder())->encode($move, $game);
+        }
+
+        $this->assertEqualsCanonicalizing($expectedAlgebraics, $actualAlgebraics);
+    }
+
+    private function provideFenWithPieceDestinationAndExpectedMoves(): array
+    {
+        return [
+            [
+                'r1bq1rk1/pp1nppbp/2p2np1/8/2QPPB2/2N2N2/PP3PPP/R3KB1R w KQ - 1 9',
+                new Move([Position::A1], [Position::D1]),
+                [],
+            ],
+        ];
     }
 
     private function provideFenWithNextMoveAndExpectedCheckState(): array
