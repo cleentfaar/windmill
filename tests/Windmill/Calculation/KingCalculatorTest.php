@@ -4,9 +4,7 @@ namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
 use App\Windmill\Calculation\KingCalculator;
-use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\King;
+use App\Windmill\PieceType;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
 class KingCalculatorTest extends AbstractCalculatorTest
@@ -49,8 +47,8 @@ class KingCalculatorTest extends AbstractCalculatorTest
         return new KingCalculator();
     }
 
-    protected function createPiece(Color $color): AbstractPiece
+    protected function getPieceType(): PieceType
     {
-        return new King($color);
+        return PieceType::KING;
     }
 }

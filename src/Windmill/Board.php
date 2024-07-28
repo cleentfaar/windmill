@@ -2,7 +2,6 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Piece\AbstractPiece;
 use Symfony\Component\Uid\Uuid;
 
 class Board
@@ -95,17 +94,17 @@ class Board
         return $this->squares;
     }
 
-    public function pieceOn(Position $position): ?AbstractPiece
+    public function pieceOn(Position $position): ?Piece
     {
         return $this->squares[$position->value] ?? null;
     }
 
-    public function squaresWithPiece(string $class, Color $color): array
+    public function squaresWithPiece(PieceType $type, Color $color): array
     {
         $positions = [];
 
         foreach ($this->squares() as $square => $piece) {
-            if ($piece && $piece::class == $class && $piece->color == $color) {
+            if ($piece && $piece->type == $type && $piece->color == $color) {
                 $positions[] = Position::tryFrom($square);
             }
         }

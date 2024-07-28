@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Windmill\Piece;
+namespace App\Windmill;
 
-use App\Windmill\Color;
-
-abstract class AbstractPiece
+class Piece
 {
     final public function __construct(
         public readonly Color $color,
+        public readonly PieceType $type,
     ) {
     }
 
@@ -16,10 +15,5 @@ abstract class AbstractPiece
         $parts = explode('\\', static::class);
 
         return array_pop($parts);
-    }
-
-    public function isKing(): bool
-    {
-        return $this::class == King::class;
     }
 }

@@ -3,13 +3,8 @@
 namespace App\Tests\Windmill\Presentation\Encoder;
 
 use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Bishop;
-use App\Windmill\Piece\King;
-use App\Windmill\Piece\Knight;
-use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Queen;
-use App\Windmill\Piece\Rook;
+use App\Windmill\Piece;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\AlgebraicPieceEncoder;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +14,7 @@ class AlgebraicPieceEncoderTest extends TestCase
     /**
      * @dataProvider providePieceAndExpectedEncoding
      */
-    public function testEncode(AbstractPiece $piece, Position $position, string $expectedEncoding)
+    public function testEncode(Piece $piece, Position $position, string $expectedEncoding)
     {
         $encoder = new AlgebraicPieceEncoder();
         $actualEncoding = $encoder->encode($piece, $position);
@@ -33,7 +28,7 @@ class AlgebraicPieceEncoderTest extends TestCase
     /**
      * @dataProvider provideEncodedAlgebraicPieceAndExpectedObject
      */
-    public function testDecode(string $algebraicPiece, Color $color, AbstractPiece $expectedPiece)
+    public function testDecode(string $algebraicPiece, Color $color, Piece $expectedPiece)
     {
         $encoder = new AlgebraicPieceEncoder();
         $actualDecodedPiece = $encoder->decode($algebraicPiece, $color);
@@ -48,36 +43,36 @@ class AlgebraicPieceEncoderTest extends TestCase
     private function providePieceAndExpectedEncoding(): array
     {
         return [
-            [new Pawn(Color::WHITE), Position::A2, 'a'],
-            [new Pawn(Color::BLACK), Position::G7, 'g'],
-            [new Bishop(Color::WHITE), Position::D4, 'B'],
-            [new Bishop(Color::BLACK), Position::D4, 'B'],
-            [new Knight(Color::WHITE), Position::D4, 'N'],
-            [new Knight(Color::BLACK), Position::D4, 'N'],
-            [new Rook(Color::WHITE), Position::D4, 'R'],
-            [new Rook(Color::BLACK), Position::D4, 'R'],
-            [new Queen(Color::WHITE), Position::D4, 'Q'],
-            [new Queen(Color::BLACK), Position::D4, 'Q'],
-            [new King(Color::WHITE), Position::D4, 'K'],
-            [new King(Color::BLACK), Position::D4, 'K'],
+            [new Piece(Color::WHITE, PieceType::PAWN), Position::A2, 'a'],
+            [new Piece(Color::BLACK, PieceType::PAWN), Position::G7, 'g'],
+            [new Piece(Color::WHITE, PieceType::BISHOP), Position::D4, 'B'],
+            [new Piece(Color::BLACK, PieceType::BISHOP), Position::D4, 'B'],
+            [new Piece(Color::WHITE, PieceType::KNIGHT), Position::D4, 'N'],
+            [new Piece(Color::BLACK, PieceType::KNIGHT), Position::D4, 'N'],
+            [new Piece(Color::WHITE, PieceType::ROOK), Position::D4, 'R'],
+            [new Piece(Color::BLACK, PieceType::ROOK), Position::D4, 'R'],
+            [new Piece(Color::WHITE, PieceType::QUEEN), Position::D4, 'Q'],
+            [new Piece(Color::BLACK, PieceType::QUEEN), Position::D4, 'Q'],
+            [new Piece(Color::WHITE, PieceType::KING), Position::D4, 'K'],
+            [new Piece(Color::BLACK, PieceType::KING), Position::D4, 'K'],
         ];
     }
 
     private function provideEncodedAlgebraicPieceAndExpectedObject(): array
     {
         return [
-            ['a', Color::WHITE, new Pawn(Color::WHITE)],
-            ['g', Color::BLACK, new Pawn(Color::BLACK)],
-            ['B', Color::WHITE, new Bishop(Color::WHITE)],
-            ['B', Color::BLACK, new Bishop(Color::BLACK)],
-            ['N', Color::WHITE, new Knight(Color::WHITE)],
-            ['N', Color::BLACK, new Knight(Color::BLACK)],
-            ['R', Color::WHITE, new Rook(Color::WHITE)],
-            ['R', Color::BLACK, new Rook(Color::BLACK)],
-            ['Q', Color::WHITE, new Queen(Color::WHITE)],
-            ['Q', Color::BLACK, new Queen(Color::BLACK)],
-            ['K', Color::WHITE, new King(Color::WHITE)],
-            ['K', Color::BLACK, new King(Color::BLACK)],
+            ['a', Color::WHITE, new Piece(Color::WHITE, PieceType::PAWN)],
+            ['g', Color::BLACK, new Piece(Color::BLACK, PieceType::PAWN)],
+            ['B', Color::WHITE, new Piece(Color::WHITE, PieceType::BISHOP)],
+            ['B', Color::BLACK, new Piece(Color::BLACK, PieceType::BISHOP)],
+            ['N', Color::WHITE, new Piece(Color::WHITE, PieceType::KNIGHT)],
+            ['N', Color::BLACK, new Piece(Color::BLACK, PieceType::KNIGHT)],
+            ['R', Color::WHITE, new Piece(Color::WHITE, PieceType::ROOK)],
+            ['R', Color::BLACK, new Piece(Color::BLACK, PieceType::ROOK)],
+            ['Q', Color::WHITE, new Piece(Color::WHITE, PieceType::QUEEN)],
+            ['Q', Color::BLACK, new Piece(Color::BLACK, PieceType::QUEEN)],
+            ['K', Color::WHITE, new Piece(Color::WHITE, PieceType::KING)],
+            ['K', Color::BLACK, new Piece(Color::BLACK, PieceType::KING)],
         ];
     }
 }

@@ -4,9 +4,7 @@ namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
 use App\Windmill\Calculation\RookCalculator;
-use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Rook;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
@@ -40,8 +38,8 @@ class RookCalculatorTest extends AbstractCalculatorTest
         return new RookCalculator();
     }
 
-    protected function createPiece(Color $color): AbstractPiece
+    protected function getPieceType(): PieceType
     {
-        return new Rook($color);
+        return PieceType::ROOK;
     }
 }

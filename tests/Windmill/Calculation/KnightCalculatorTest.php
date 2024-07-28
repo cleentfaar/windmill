@@ -4,9 +4,7 @@ namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
 use App\Windmill\Calculation\KnightCalculator;
-use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Knight;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
@@ -43,8 +41,8 @@ class KnightCalculatorTest extends AbstractCalculatorTest
         return new KnightCalculator();
     }
 
-    protected function createPiece(Color $color): AbstractPiece
+    protected function getPieceType(): PieceType
     {
-        return new Knight($color);
+        return PieceType::KNIGHT;
     }
 }

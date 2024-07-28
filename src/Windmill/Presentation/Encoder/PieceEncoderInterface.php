@@ -3,12 +3,12 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
+use App\Windmill\Piece;
 use App\Windmill\Position;
 
 interface PieceEncoderInterface
 {
-    public function encode(AbstractPiece $decodedPiece, Position $position): string;
+    public function encode(Piece $decodedPiece, Position $position): string;
 
-    public function decode(string $encodedPiece, Color $color): AbstractPiece;
+    public function decode(string $encodedPiece, Color $color): Piece;
 }

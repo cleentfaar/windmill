@@ -6,13 +6,8 @@ use App\Windmill\Board;
 use App\Windmill\CastlingAvailability;
 use App\Windmill\Color;
 use App\Windmill\Game;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Bishop;
-use App\Windmill\Piece\King;
-use App\Windmill\Piece\Knight;
-use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Queen;
-use App\Windmill\Piece\Rook;
+use App\Windmill\Piece;
+use App\Windmill\PieceType;
 use App\Windmill\PlayerInterface;
 use App\Windmill\Position;
 use App\Windmill\State;
@@ -165,22 +160,22 @@ class FENGameEncoder implements GameEncoderInterface
                     $file += ($f - 1);
                     break;
                 case 'p':
-                    $squares[$file.$rank] = new Pawn(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::PAWN);
                     break;
                 case 'b':
-                    $squares[$file.$rank] = new Bishop(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::BISHOP);
                     break;
                 case 'n':
-                    $squares[$file.$rank] = new Knight(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::KNIGHT);
                     break;
                 case 'r':
-                    $squares[$file.$rank] = new Rook(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::ROOK);
                     break;
                 case 'q':
-                    $squares[$file.$rank] = new Queen(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::QUEEN);
                     break;
                 case 'k':
-                    $squares[$file.$rank] = new King(ctype_upper($f) ? Color::WHITE : Color::BLACK);
+                    $squares[$file.$rank] = new Piece(ctype_upper($f) ? Color::WHITE : Color::BLACK, PieceType::KING);
                     break;
                 case '/':
                     $file = 0;
@@ -232,16 +227,15 @@ class FENGameEncoder implements GameEncoderInterface
         return (int) explode(' ', $encodedGame)[self::FEN_FIELDS['fullmove clock']];
     }
 
-    private function encodePiece(AbstractPiece $piece): string
+    private function encodePiece(Piece $piece): string
     {
-        return match ($piece::class) {
-            Pawn::class => Color::WHITE == $piece->color ? 'P' : 'p',
-            Bishop::class => Color::WHITE == $piece->color ? 'B' : 'b',
-            Knight::class => Color::WHITE == $piece->color ? 'N' : 'n',
-            Rook::class => Color::WHITE == $piece->color ? 'R' : 'r',
-            Queen::class => Color::WHITE == $piece->color ? 'Q' : 'q',
-            King::class => Color::WHITE == $piece->color ? 'K' : 'k',
-            default => throw new \Exception(sprintf('Unsupported piece: %s', $piece::class)),
+        return match ($piece->type) {
+            PieceType::PAWN => Color::WHITE == $piece->color ? 'P' : 'p',
+            PieceType::BISHOP => Color::WHITE == $piece->color ? 'B' : 'b',
+            PieceType::KNIGHT => Color::WHITE == $piece->color ? 'N' : 'n',
+            PieceType::ROOK => Color::WHITE == $piece->color ? 'R' : 'r',
+            PieceType::QUEEN => Color::WHITE == $piece->color ? 'Q' : 'q',
+            PieceType::KING => Color::WHITE == $piece->color ? 'K' : 'k',
         };
     }
 }

@@ -4,9 +4,7 @@ namespace App\Tests\Windmill\Calculation;
 
 use App\Windmill\Calculation\AbstractPieceCalculator;
 use App\Windmill\Calculation\PawnCalculator;
-use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Pawn;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
 
@@ -45,8 +43,8 @@ class PawnCalculatorTest extends AbstractCalculatorTest
         return new PawnCalculator();
     }
 
-    protected function createPiece(Color $color): AbstractPiece
+    protected function getPieceType(): PieceType
     {
-        return new Pawn($color);
+        return PieceType::PAWN;
     }
 }

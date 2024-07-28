@@ -8,6 +8,7 @@ use App\Windmill\Engine\Random;
 use App\Windmill\Game;
 use App\Windmill\GameFactory;
 use App\Windmill\MoveCollection;
+use App\Windmill\PieceType;
 use App\Windmill\Player;
 use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\AsciiBoardEncoder;
@@ -39,9 +40,9 @@ abstract class AbstractTestCase extends TestCase
         );
     }
 
-    protected static function findPiecesOnBoard(string $class, Color $currentColor, Board $board): array
+    protected static function findPiecesOnBoard(PieceType $type, Color $currentColor, Board $board): array
     {
-        return $board->squaresWithPiece($class, $currentColor);
+        return $board->squaresWithPiece($type, $currentColor);
     }
 
     protected static function encodeMovesToSANs(MoveCollection $moveCollection, Game $game): array

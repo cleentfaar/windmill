@@ -3,7 +3,7 @@
 namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
+use App\Windmill\Piece;
 use App\Windmill\Position;
 
 class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
@@ -24,7 +24,7 @@ class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
         );
     }
 
-    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece): string
+    protected function renderPieceSymbol(Position $position, ?Piece $piece): string
     {
         $bg = $this->getBackgroundColor($position);
         $fg = $this->getForegroundColor($piece);
@@ -42,7 +42,7 @@ class SymfonyConsoleBoardEncoder extends AsciiBoardEncoder
         return $this->whiteBg;
     }
 
-    private function getForegroundColor(?AbstractPiece $piece): string
+    private function getForegroundColor(?Piece $piece): string
     {
         if ($piece && Color::WHITE == $piece->color) {
             return $this->whiteFg;

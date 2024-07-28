@@ -7,8 +7,7 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
 use App\Windmill\Move;
-use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Rook;
+use App\Windmill\PieceType;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
@@ -22,10 +21,10 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
     {
         $movingPiece = $game->board->pieceOn($move->primary->from);
 
-        if ($movingPiece->isKing()) {
+        if ($movingPiece->type == PieceType::KING) {
             $secondaryPiece = $move->secondary && $move->secondary->to ? $game->board->pieceOn($move->secondary->from) : null;
 
-            if (is_object($secondaryPiece) && $secondaryPiece::class == Rook::class && $secondaryPiece->color == $movingPiece->color) {
+            if (is_object($secondaryPiece) && $secondaryPiece->type == PieceType::ROOK && $secondaryPiece->color == $movingPiece->color) {
                 // castling
                 if ($move->fileDifference(1) > 2) {
                     return '0-0-0';
@@ -87,7 +86,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         if (sizeof($movesWithSameFile) == 0) {
             $movingPiece = $game->board->pieceOn($move->primary->from);
 
-            if ($movingPiece::class != Pawn::class) {
+            if ($movingPiece->type != PieceType::PAWN) {
                 return $move->primary->from->fileLetter();
             } else {
                 return '';
@@ -111,7 +110,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         $captureablePiecePosition = isset($move->secondary->from) ? ($move->secondary->from == $move->primary->to ? $move->primary->to : $move->secondary->from) : $move->primary->to;
         $piece = $board->pieceOn($move->primary->from);
 
-        if (Pawn::class == $piece::class) {
+        if ($piece->type == PieceType::PAWN) {
             if ($board->pieceOn($captureablePiecePosition)) {
                 return $move->primary->from->fileLetter();
             }

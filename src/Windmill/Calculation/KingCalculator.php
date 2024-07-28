@@ -7,7 +7,7 @@ use App\Windmill\Color;
 use App\Windmill\Game;
 use App\Windmill\Move;
 use App\Windmill\MoveCollection;
-use App\Windmill\Piece\Rook;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 
 class KingCalculator extends AbstractPieceCalculator
@@ -84,7 +84,7 @@ class KingCalculator extends AbstractPieceCalculator
 
         $rook = $game->board->pieceOn($rookPosition);
 
-        if (!$rook || $rook->color != $game->currentColor() || Rook::class !== $rook::class) {
+        if (!$rook || $rook->color != $game->currentColor() || $rook->type !== PieceType::ROOK) {
             return;
         }
 
@@ -116,7 +116,7 @@ class KingCalculator extends AbstractPieceCalculator
 
         $rook = $game->board->pieceOn($rookPosition);
 
-        if (!$rook || $rook->color != $game->currentColor() || Rook::class !== $rook::class) {
+        if (!$rook || $rook->color != $game->currentColor() || $rook->type !== PieceType::ROOK) {
             return;
         }
 

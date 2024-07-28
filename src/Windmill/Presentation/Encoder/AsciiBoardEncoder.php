@@ -4,33 +4,28 @@ namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Board;
 use App\Windmill\Color;
-use App\Windmill\Piece\AbstractPiece;
-use App\Windmill\Piece\Bishop;
-use App\Windmill\Piece\King;
-use App\Windmill\Piece\Knight;
-use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Queen;
-use App\Windmill\Piece\Rook;
+use App\Windmill\Piece;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 
 class AsciiBoardEncoder implements BoardEncoderInterface
 {
     private const array PIECE_SYMBOLS = [
         Color::WHITE->value => [
-            Pawn::class => '♙',
-            Bishop::class => '♗',
-            Knight::class => '♘',
-            Rook::class => '♖',
-            Queen::class => '♕',
-            King::class => '♔',
+            PieceType::PAWN->value => '♙',
+            PieceType::BISHOP->value => '♗',
+            PieceType::KNIGHT->value => '♘',
+            PieceType::ROOK->value => '♖',
+            PieceType::QUEEN->value => '♕',
+            PieceType::KING->value => '♔',
         ],
         Color::BLACK->value => [
-            Pawn::class => '♟︎',
-            Bishop::class => '♝',
-            Knight::class => '♞',
-            Rook::class => '♜',
-            Queen::class => '♛',
-            King::class => '♚',
+            PieceType::PAWN->value => '♟︎',
+            PieceType::BISHOP->value => '♝',
+            PieceType::KNIGHT->value => '♞',
+            PieceType::ROOK->value => '♜',
+            PieceType::QUEEN->value => '♛',
+            PieceType::KING->value => '♚',
         ],
     ];
 
@@ -66,12 +61,12 @@ class AsciiBoardEncoder implements BoardEncoderInterface
         return $output;
     }
 
-    protected function renderPieceSymbol(Position $position, ?AbstractPiece $piece): string
+    protected function renderPieceSymbol(Position $position, ?Piece $piece): string
     {
         return $this->getPieceSymbol($piece);
     }
 
-    protected function getPieceSymbol(?AbstractPiece $piece): string
+    protected function getPieceSymbol(?Piece $piece): string
     {
         if ($piece) {
             if (Color::WHITE == $piece->color && $this->solidWhite) {
@@ -84,7 +79,7 @@ class AsciiBoardEncoder implements BoardEncoderInterface
 
             return join('', [
                 $this->spacingCharacter,
-                self::PIECE_SYMBOLS[$color->value][$piece::class],
+                self::PIECE_SYMBOLS[$color->value][$piece->type->value],
                 $this->spacingCharacter,
             ]);
         }

@@ -4,7 +4,7 @@ namespace App\Windmill\Presentation\Encoder;
 
 use App\Windmill\Game;
 use App\Windmill\Move;
-use App\Windmill\Piece\Pawn;
+use App\Windmill\PieceType;
 
 class VerboseMoveEncoder implements MoveEncoderInterface
 {
@@ -20,12 +20,12 @@ class VerboseMoveEncoder implements MoveEncoderInterface
         $algebraic = $this->moveEncoder->encode($move, $game);
 
         if (2 == mb_strlen($algebraic)) {
-            $encoded .= Pawn::name();
+            $encoded .= PieceType::PAWN->name();
         } else {
             $encoded .= $this->pieceEncoder->decode(
                 mb_substr($algebraic, 0, 1),
                 $game->currentColor()
-            )::name();
+            )->type->name();
         }
 
         if ('0-0' == $algebraic) {
@@ -40,7 +40,7 @@ class VerboseMoveEncoder implements MoveEncoderInterface
 
         if (mb_stristr($algebraic, 'x')) {
             $capturedPiece = $game->board->pieceOn($move->primary->to);
-            $encoded .= ' takes '.$capturedPiece::name().' on';
+            $encoded .= ' takes '.$capturedPiece->type->name().' on';
         } else {
             $encoded .= ' to';
         }

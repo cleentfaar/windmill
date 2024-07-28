@@ -4,9 +4,8 @@ namespace App\Tests\Windmill\Calculation;
 
 use App\Tests\AbstractTestCase;
 use App\Windmill\Calculation\AbstractPieceCalculator;
-use App\Windmill\Color;
 use App\Windmill\MoveCollection;
-use App\Windmill\Piece\AbstractPiece;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 use App\Windmill\Presentation\Encoder\AlgebraicMoveEncoder;
 use App\Windmill\Presentation\Encoder\FENGameEncoder;
@@ -24,7 +23,7 @@ abstract class AbstractCalculatorTest extends AbstractTestCase
         $game = self::createGameFromFEN($fen);
         $calculator = $this->createCalculator();
         $actualMoveCollection = new MoveCollection();
-        $pos = $currentPosition ? [$currentPosition] : self::findPiecesOnBoard($this->createPiece($game->currentColor())::class, $game->currentColor(), $game->board);
+        $pos = $currentPosition ? [$currentPosition] : self::findPiecesOnBoard($this->getPieceType(), $game->currentColor(), $game->board);
 
         foreach ($pos as $p) {
             $calculator->calculate(
@@ -69,5 +68,5 @@ abstract class AbstractCalculatorTest extends AbstractTestCase
 
     abstract protected function createCalculator(): AbstractPieceCalculator;
 
-    abstract protected function createPiece(Color $color): AbstractPiece;
+    abstract protected function getPieceType(): PieceType;
 }

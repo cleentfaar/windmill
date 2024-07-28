@@ -2,9 +2,7 @@
 
 namespace App\Windmill;
 
-use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Rook;
 use Symfony\Component\Uid\Uuid;
 
 class Game
@@ -86,7 +84,7 @@ class Game
         $halfMoveReset = false;
 
         if (
-            Pawn::class == $this->board->pieceOn($move->primary->from)::class
+            $this->board->pieceOn($move->primary->from)->type == PieceType::PAWN
             && 2 == $move->rankDifference()
             && $move->staysOnFile()
         ) {
@@ -95,14 +93,15 @@ class Game
             $this->enPassantTargetSquare = null;
         }
 
-        if (Pawn::class == $this->board->pieceOn($move->primary->from)::class) {
+        if ($this->board->pieceOn($move->primary->from)->type == PieceType::PAWN) {
             // pawn is moving
             $halfMoveReset = true;
         }
 
         foreach ($move->from as $from) {
             $fromPiece = $this->board->pieceOn($from);
-            if ($fromPiece && in_array($fromPiece::class, [King::class, Rook::class])) {
+
+            if ($fromPiece && in_array($fromPiece->type, [PieceType::KING, PieceType::ROOK])) {
                 // castle
                 if (Color::WHITE == $this->colorToMove) {
                     $this->castlingAvailability->whiteCanCastleQueenside = false;

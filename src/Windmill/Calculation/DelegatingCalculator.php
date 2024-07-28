@@ -7,12 +7,8 @@ use App\Windmill\Color;
 use App\Windmill\Game;
 use App\Windmill\Move;
 use App\Windmill\MoveCollection;
-use App\Windmill\Piece\Bishop;
 use App\Windmill\Piece\King;
-use App\Windmill\Piece\Knight;
-use App\Windmill\Piece\Pawn;
-use App\Windmill\Piece\Queen;
-use App\Windmill\Piece\Rook;
+use App\Windmill\PieceType;
 use App\Windmill\Position;
 
 class DelegatingCalculator
@@ -25,12 +21,12 @@ class DelegatingCalculator
     public function __construct(array $calculators = [])
     {
         $this->calculators = $calculators ?: [
-            Pawn::class => new PawnCalculator(),
-            Bishop::class => new BishopCalculator(),
-            Knight::class => new KnightCalculator(),
-            Rook::class => new RookCalculator(),
-            Queen::class => new QueenCalculator(),
-            King::class => new KingCalculator(),
+            PieceType::PAWN->value => new PawnCalculator(),
+            PieceType::BISHOP->value => new BishopCalculator(),
+            PieceType::KNIGHT->value => new KnightCalculator(),
+            PieceType::ROOK->value => new RookCalculator(),
+            PieceType::QUEEN->value => new QueenCalculator(),
+            PieceType::KING->value => new KingCalculator(),
         ];
     }
 
@@ -41,7 +37,7 @@ class DelegatingCalculator
 
         foreach ($game->board->squares() as $position => $piece) {
             if ($piece && $piece->color == $currentColor) {
-                $this->calculators[$piece::class]->calculate(
+                $this->calculators[$piece->type->value]->calculate(
                     $game,
                     Position::from($position),
                     $piece->color,
@@ -58,7 +54,7 @@ class DelegatingCalculator
         $movingPiece = $game->board->pieceOn($move->primary->from);
         $clone = clone $game;
         $clone->move($move, true);
-        $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
+        $squaresWithOppositeKing = $clone->board->squaresWithPiece(PieceType::KING, Color::oppositeOf($movingPiece->color));
 
         if (1 != sizeof($squaresWithOppositeKing)) {
             return CheckState::NONE;
@@ -81,7 +77,7 @@ class DelegatingCalculator
             $c = clone $clone;
             $c->move($kingMove);
             $mc = $this->calculate($c);
-            $sqk = $c->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
+            $sqk = $c->board->squaresWithPiece(PieceType::KING, Color::oppositeOf($movingPiece->color));
             $mk = $mc->to($sqk[0]);
 
             if (0 == sizeof($mk)) {
@@ -104,7 +100,7 @@ class DelegatingCalculator
         foreach ($moves as $m) {
             foreach ($m->to as $x => $t) {
                 $fromPiece = $game->board->pieceOn($m->from[$x]);
-                if ($t == $move->primary->to && $fromPiece && $fromPiece::class == $piece::class && $m->from[$x] !== $move->primary->from) {
+                if ($t == $move->primary->to && $fromPiece && $fromPiece->type == $piece->type && $m->from[$x] !== $move->primary->from) {
                     $eligible[] = $m;
                 }
             }
