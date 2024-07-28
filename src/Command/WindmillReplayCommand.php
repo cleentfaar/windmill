@@ -109,7 +109,7 @@ class WindmillReplayCommand extends Command
             }
         }
 
-        $checkState = (new DelegatingCalculator())->calculcateCheckState($lastMove, $previousGame);
+        $checkState = (new DelegatingCalculator())->calculateCheckState($lastMove, $previousGame);
 
         $lastMoveSection->overwrite(sprintf(
             'Game finished: %s',

@@ -40,7 +40,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
         $isCapture = $move->secondary && $move->secondary->to == null;
         $firstChar = $this->encodeMovingPieceChar($move, $game->board);
         $uniqueFile = $this->encodeUniqueFileOrRank($move, $game);
-        $checksOrCheckmates = $this->encodeCheckState($this->calculator->calculcateCheckState($move, $game));
+        $checksOrCheckmates = $this->encodeCheckState($this->calculator->calculateCheckState($move, $game));
 
         return join('', [
             $firstChar,

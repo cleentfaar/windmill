@@ -14,11 +14,11 @@ class DelegatingCalculatorTest extends AbstractTestCase
     /**
      * @dataProvider provideFenWithNextMoveAndExpectedCheckState
      */
-    public function testCalculcateCheckState(string $fen, Move $move, CheckState $expectedState): void
+    public function testCalculateCheckState(string $fen, Move $move, CheckState $expectedState): void
     {
         $game = self::createGameFromFEN($fen);
         $calculator = new DelegatingCalculator();
-        $actualCheckState = $calculator->calculcateCheckState($move, $game);
+        $actualCheckState = $calculator->calculateCheckState($move, $game);
 
         $this->assertEquals($expectedState, $actualCheckState);
     }

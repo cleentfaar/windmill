@@ -53,7 +53,7 @@ class DelegatingCalculator
         return $moveCollection;
     }
 
-    public function calculcateCheckState(Move $move, Game $game): CheckState
+    public function calculateCheckState(Move $move, Game $game): CheckState
     {
         $movingPiece = $game->board->pieceOn($move->primary->from);
         $clone = clone $game;
