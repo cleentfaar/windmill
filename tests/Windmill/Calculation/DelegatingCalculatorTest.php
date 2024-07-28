@@ -30,7 +30,7 @@ class DelegatingCalculatorTest extends AbstractTestCase
     {
         $game = self::createGameFromFEN($fen);
         $calculator = new DelegatingCalculator();
-        $actualCollection = $calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource($move, $game);
+        $actualCollection = $calculator->calculcatePiecesOfTypeWithSameToButDifferentFrom($move, $game);
         $actualAlgebraics = [];
 
         foreach ($actualCollection as $move) {

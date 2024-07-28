@@ -4,6 +4,9 @@ namespace App\Windmill;
 
 class Move
 {
+    public readonly PrimaryMove $primary;
+    public readonly ?SecondaryMove $secondary;
+
     /**
      * @param Position[] $from
      * @param Position[] $to
@@ -13,6 +16,8 @@ class Move
         public readonly array $to,
         public readonly ?string $comment = null
     ) {
+        $this->primary = new PrimaryMove($from[0], $to[0]);
+        $this->secondary = isset($from[1]) ? new SecondaryMove($from[1], $to[1] ?? null) : null;
     }
 
     public function fileDifference(int $index = 0): int

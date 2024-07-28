@@ -39,13 +39,13 @@ class VerboseMoveEncoder implements MoveEncoderInterface
         }
 
         if (mb_stristr($algebraic, 'x')) {
-            $capturedPiece = $game->board->pieceOn($move->to[0]);
+            $capturedPiece = $game->board->pieceOn($move->primary->to);
             $encoded .= ' takes '.$capturedPiece::name().' on';
         } else {
             $encoded .= ' to';
         }
 
-        $encoded .= ' '.$move->to[0]->name;
+        $encoded .= ' '.$move->primary->to->name;
 
         return $encoded;
     }

@@ -102,6 +102,11 @@ enum Position: int
         return substr($this->value, 1, 1);
     }
 
+    public function square(): string
+    {
+        return sprintf('%s%d', $this->fileLetter(), $this->rank());
+    }
+
     public function fileLetter(): string
     {
         return self::RANK_LETTERS[$this->file()];

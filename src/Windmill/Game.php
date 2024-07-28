@@ -86,16 +86,16 @@ class Game
         $halfMoveReset = false;
 
         if (
-            Pawn::class == $this->board->pieceOn($move->from[0])::class
+            Pawn::class == $this->board->pieceOn($move->primary->from)::class
             && 2 == $move->rankDifference()
             && $move->staysOnFile()
         ) {
-            $this->enPassantTargetSquare = $move->to[0];
+            $this->enPassantTargetSquare = $move->primary->to;
         } else {
             $this->enPassantTargetSquare = null;
         }
 
-        if (Pawn::class == $this->board->pieceOn($move->from[0])::class) {
+        if (Pawn::class == $this->board->pieceOn($move->primary->from)::class) {
             // pawn is moving
             $halfMoveReset = true;
         }

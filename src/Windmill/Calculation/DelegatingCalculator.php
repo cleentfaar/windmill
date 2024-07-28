@@ -55,7 +55,7 @@ class DelegatingCalculator
 
     public function calculcateCheckState(Move $move, Game $game): CheckState
     {
-        $movingPiece = $game->board->pieceOn($move->from[0]);
+        $movingPiece = $game->board->pieceOn($move->primary->from);
         $clone = clone $game;
         $clone->move($move, true);
         $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
@@ -95,16 +95,16 @@ class DelegatingCalculator
         return $canEscape ? CheckState::CHECK : CheckState::CHECKMATE;
     }
 
-    public function calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(Move $move, Game $game): MoveCollection
+    public function calculcatePiecesOfTypeWithSameToButDifferentFrom(Move $move, Game $game): MoveCollection
     {
-        $piece = $game->board->pieceOn($move->from[0]);
-        $moves = $this->calculate($game)->to($move->to[0]);
+        $piece = $game->board->pieceOn($move->primary->from);
+        $moves = $this->calculate($game)->to($move->primary->to);
         $eligible = [];
 
         foreach ($moves as $m) {
             foreach ($m->to as $x => $t) {
                 $fromPiece = $game->board->pieceOn($m->from[$x]);
-                if ($t == $move->to[0] && $fromPiece && $fromPiece::class == $piece::class && $m->from[$x] !== $move->from[0]) {
+                if ($t == $move->primary->to && $fromPiece && $fromPiece::class == $piece::class && $m->from[$x] !== $move->primary->from) {
                     $eligible[] = $m;
                 }
             }

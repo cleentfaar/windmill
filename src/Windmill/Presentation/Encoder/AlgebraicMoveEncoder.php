@@ -22,12 +22,12 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     public function encode(Move $move, Game $game): string
     {
-        $movingPiece = $game->board->pieceOn($move->from[0]);
+        $movingPiece = $game->board->pieceOn($move->primary->from);
 
-        if (King::class == $movingPiece::class) {
-            $secondaryPiece = isset($move->from[1]) && isset($move->to[1]) ? $game->board->pieceOn($move->from[1]) : null;
+        if ($movingPiece->isKing()) {
+            $secondaryPiece = $move->secondary && $move->secondary->to ? $game->board->pieceOn($move->secondary->from) : null;
 
-            if ($secondaryPiece && $secondaryPiece::class == Rook::class && $secondaryPiece->color == $movingPiece->color) {
+            if (is_object($secondaryPiece) && $secondaryPiece::class == Rook::class && $secondaryPiece->color == $movingPiece->color) {
                 // castling
                 if ($move->fileDifference(1) > 2) {
                     return '0-0-0';
@@ -37,19 +37,16 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
             }
         }
 
-        $moveTo = $move->to[0];
-        $isCapture = sizeof($move->to) > 1 && 1 == sizeof(array_filter($move->to));
-        $captureablePiecePosition = isset($move->from[1]) ? ($move->from[1] == $move->to[0] ? $move->to[0] : $move->from[1]) : $move->to[0];
-        $firstChar = $this->encodeMovingPieceChar($move->from[0], $captureablePiecePosition, $game->board);
+        $isCapture = $move->secondary && $move->secondary->to == null;
+        $firstChar = $this->encodeMovingPieceChar($move, $game->board);
         $uniqueFile = $this->encodeUniqueFileOrRank($move, $game);
-        $checksOrCheckmates = $this->encodeChecksOrCheckmatesOpponent($move, $game);
+        $checksOrCheckmates = $this->encodeCheckState($this->calculator->calculcateCheckState($move, $game));
 
         return join('', [
             $firstChar,
             $uniqueFile,
             $isCapture ? 'x' : '',
-            $moveTo->fileLetter(),
-            $moveTo->rank(),
+            $move->primary->to->square(),
             $checksOrCheckmates,
         ]);
     }
@@ -78,7 +75,7 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
 
     private function encodeUniqueFileOrRank(Move $move, Game $game): string
     {
-        $movesWithSameDestination = $this->calculator->calculcatePiecesOfTypeWithSameDestinationAndDifferentSource(
+        $movesWithSameDestination = $this->calculator->calculcatePiecesOfTypeWithSameToButDifferentFrom(
             $move,
             $game
         );
@@ -87,42 +84,43 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
             return '';
         }
 
-        $movesWithSameFile = $movesWithSameDestination->fromFile($move->from[0]->file());
+        $movesWithSameFile = $movesWithSameDestination->fromFile($move->primary->from->file());
 
         if (sizeof($movesWithSameFile) == 0) {
-            $movingPiece = $game->board->pieceOn($move->from[0]);
+            $movingPiece = $game->board->pieceOn($move->primary->from);
 
             if ($movingPiece::class != Pawn::class) {
-                return $move->from[0]->fileLetter();
+                return $move->primary->from->fileLetter();
             } else {
                 return '';
             }
         }
 
-        return $move->from[0]->rank();
+        return $move->primary->from->rank();
     }
 
-    private function encodeChecksOrCheckmatesOpponent(Move $move, Game $game): string
+    private function encodeCheckState(CheckState $checkState): string
     {
-        return match ($this->calculator->calculcateCheckState($move, $game)) {
+        return match ($checkState) {
             CheckState::CHECK => '+',
             CheckState::CHECKMATE => '#',
             default => '',
         };
     }
 
-    private function encodeMovingPieceChar(Position $from, Position $captureablePiecePosition, Board $board): string
+    private function encodeMovingPieceChar(Move $move, Board $board): string
     {
-        $piece = $board->pieceOn($from);
+        $captureablePiecePosition = isset($move->secondary->from) ? ($move->secondary->from == $move->primary->to ? $move->primary->to : $move->secondary->from) : $move->primary->to;
+        $piece = $board->pieceOn($move->primary->from);
 
         if (Pawn::class == $piece::class) {
             if ($board->pieceOn($captureablePiecePosition)) {
-                return $from->fileLetter();
+                return $move->primary->from->fileLetter();
             }
 
             return '';
         }
 
-        return $this->pieceEncoder->encode($piece, $from);
+        return $this->pieceEncoder->encode($piece, $move->primary->from);
     }
 }
