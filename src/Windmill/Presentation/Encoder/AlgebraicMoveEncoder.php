@@ -7,10 +7,8 @@ use App\Windmill\Calculation\DelegatingCalculator;
 use App\Windmill\CheckState;
 use App\Windmill\Game;
 use App\Windmill\Move;
-use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
 use App\Windmill\Piece\Rook;
-use App\Windmill\Position;
 
 class AlgebraicMoveEncoder implements MoveEncoderInterface
 {
