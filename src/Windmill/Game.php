@@ -4,6 +4,7 @@ namespace App\Windmill;
 
 use App\Windmill\Piece\King;
 use App\Windmill\Piece\Pawn;
+use App\Windmill\Piece\Rook;
 use Symfony\Component\Uid\Uuid;
 
 class Game
@@ -28,12 +29,13 @@ class Game
 
     public function move(Move $move, bool $virtual = false)
     {
-        $this->updateStatesBeforeExecutingMove($move);
-        $this->board->move($move);
-
         if (!$virtual) {
+            $this->updateStatesBeforeExecutingMove($move);
+            $this->board->move($move);
             $this->colorToMove = Color::WHITE == $this->colorToMove ? Color::BLACK : Color::WHITE;
             $this->lastMove = $move;
+        } else {
+            $this->board->move($move);
         }
     }
 
@@ -81,7 +83,8 @@ class Game
         }
 
         foreach ($move->from as $from) {
-            if (King::class == $this->board->pieceOn($from)::class && $move->fileDifference() > 1) {
+            $fromPiece = $this->board->pieceOn($from);
+            if ($fromPiece && in_array($fromPiece::class, [King::class, Rook::class])) {
                 // castle
                 if (Color::WHITE == $this->colorToMove) {
                     $this->castlingAvailability->whiteCanCastleQueenside = false;
@@ -94,7 +97,8 @@ class Game
         }
 
         foreach ($move->to as $x => $to) {
-            if (null == $to && $this->board->pieceOn($move->from[$x])->color != $this->colorToMove) {
+            $fromPiece = $this->board->pieceOn($move->from[$x]);
+            if (null == $to && $fromPiece && $fromPiece->color != $this->colorToMove) {
                 // capture
                 $halfMoveReset = true;
             }

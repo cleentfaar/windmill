@@ -54,9 +54,14 @@ class AlgebraicMoveEncoder implements MoveEncoderInterface
     {
         $algebraic = str_replace('O', '0', $algebraic);
         $possibleMoves = [];
+        $availableMoves = $this->calculator->calculate($game);
 
-        foreach ($this->calculator->calculate($game) as $move) {
+        foreach ($availableMoves as $move) {
             $encoded = $this->encode($move, $game);
+            if (Position::D8 == $move->to[0]) {
+                //                dump($move, $encoded);
+                //                exit;
+            }
 
             if ($encoded == $algebraic) {
                 $possibleMoves[$encoded] = $move;

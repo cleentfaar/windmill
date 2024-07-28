@@ -44,7 +44,7 @@ class VerboseMoveEncoder implements MoveEncoderInterface
 
         if (mb_stristr($algebraic, 'x')) {
             $capturedPiece = $game->board->pieceOn($move->to[0]);
-            $encoded .= ' takes '.$capturedPiece::class.' on';
+            $encoded .= ' takes '.$capturedPiece::name().' on';
         } else {
             $encoded .= ' to';
         }

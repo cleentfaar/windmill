@@ -55,8 +55,7 @@ class DelegatingCalculator
 
     public function calculcateCheckState(Move $move, Game $game): CheckState
     {
-        $moveFrom = $move->from[0];
-        $movingPiece = $game->board->pieceOn($moveFrom);
+        $movingPiece = $game->board->pieceOn($move->from[0]);
         $clone = clone $game;
         $clone->move($move, true);
         $squaresWithOppositeKing = $clone->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
@@ -73,32 +72,28 @@ class DelegatingCalculator
         }
 
         $clone = clone $game;
-        $clone->move($move);
+        $clone->move($move); // now king is checked, we need to see if he can escape
 
-        foreach ($movesAttackingKing as $m) {
-            return CheckState::CHECK; // stop here until checkmate logic is fixed
-            //            $movesByKing = $this->calculate($game)->from($squaresWithOppositeKing[0])->all();
-            //
-            //            if (0 == sizeof($movesByKing)) {
-            //                // king has nowhere to go, checkmate
-            //                return CheckState::CHECKMATE;
-            //            }
-            //
-            //            foreach ($movesByKing as $moveByKing) {
-            //                $g = clone $clone;
-            //                $g->move($moveByKing);
-            //                $newKingDestination = $moveByKing->to[0];
-            //                $movesStillAttackingKing = $this->calculateWithDestination($newKingDestination, $g)->all();
-            //
-            //                if (sizeof($movesStillAttackingKing) > 0) {
-            //                    return CheckState::CHECKMATE;
-            //                }
-            //            }
-            //
-            //            return CheckState::CHECK;
+        $kingMoves = $this->calculate($clone);
+        $canEscape = true;
+
+        foreach ($kingMoves as $kingMove) {
+            $c = clone $clone;
+            $c->move($kingMove);
+            $mc = $this->calculate($c);
+            $sqk = $c->board->squaresWithPiece(King::class, Color::oppositeOf($movingPiece->color));
+            $mk = $mc->to($sqk[0]);
+
+            if (0 == sizeof($mk)) {
+                // at least one way to escape
+                $canEscape = true;
+                break;
+            } else {
+                $canEscape = false;
+            }
         }
 
-        return CheckState::NONE;
+        return $canEscape ? CheckState::CHECK : CheckState::CHECKMATE;
     }
 
     public function calculcateMultiplePiecesWithDestination(string $pieceClass, Position $destination, Game $game): bool
